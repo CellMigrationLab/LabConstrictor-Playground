@@ -1,17 +1,11 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="labconstrictor_playground",
-    version="0.1.0",
-    description="LabConstrictor Playground: check an installation (machine, worker, GPU) and try every feature of the tools bridge",
+    name="PYTHON_PROJ_NAME",
+    version="VERSION_NUMBER",
     package_dir={"": "src"},
     packages=find_packages(where="src"),
-    python_requires=">=3.12",
+    python_requires=">=PYTHON_VERSION",
     install_requires=[
-        "numpy",
-        "pandas",
-        "scipy",
-        "matplotlib",
-        "tifffile",
     ],
 )
