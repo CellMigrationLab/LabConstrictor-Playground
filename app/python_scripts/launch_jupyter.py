@@ -1,4 +1,4 @@
-"""TLS-resilient JupyterLab launcher for PROJECT_NAME.
+"""TLS-resilient JupyterLab launcher for LabConstrictorPlayground.
 
 Certificate handling is configured before JupyterLab imports Tornado. On
 Windows this prevents one malformed certificate-store entry from terminating
@@ -20,7 +20,7 @@ from datetime import datetime, timezone
 from importlib import metadata
 from pathlib import Path
 
-PROJECT_DISPLAY_NAME = "PROJECT_NAME"
+PROJECT_DISPLAY_NAME = "LabConstrictorPlayground"
 SCRIPT_DIR = Path(__file__).resolve().parent
 _INSTALLED_LAYOUT = (SCRIPT_DIR / "notebooks").is_dir()
 if _INSTALLED_LAYOUT:

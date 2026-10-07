@@ -1,9 +1,9 @@
 @ECHO OFF
-SETLOCAL EnableExtensions
+SETLOCAL EnableExtensions DisableDelayedExpansion
 
 SET "LOG_FILE=%PREFIX%\menuinst_debug.log"
 SET "PYTHON_EXE=%PREFIX%\python.exe"
-SET "PROJECT_ROOT=%PREFIX%\PROJECT_NAME"
+SET "PROJECT_ROOT=%PREFIX%\LabConstrictorPlayground"
 SET "BASE_REQUIREMENTS=%PROJECT_ROOT%\requirements.txt"
 SET "GPU_REQUIREMENTS=%PROJECT_ROOT%\requirements_gpu.txt"
 SET "SELECTED_REQUIREMENTS=%BASE_REQUIREMENTS%"
@@ -70,9 +70,18 @@ IF EXIST "%GPU_REQUIREMENTS%" (
 echo Installing requirements from "%SELECTED_REQUIREMENTS%" >> "%LOG_FILE%"
 "%PYTHON_EXE%" -m pip install -r "%SELECTED_REQUIREMENTS%" >> "%LOG_FILE%" 2>&1
 IF ERRORLEVEL 1 (
+    IF /I NOT "%SELECTED_REQUIREMENTS%"=="%BASE_REQUIREMENTS%" (
+        REM The GPU build could not be installed (network, proxy, an index that is down): the application must still install.
+        echo WARNING: installing the GPU requirements failed; falling back to the CPU requirements from "%BASE_REQUIREMENTS%" >> "%LOG_FILE%"
+        SET "SELECTED_REQUIREMENTS=%BASE_REQUIREMENTS%"
+        "%PYTHON_EXE%" -m pip install -r "%BASE_REQUIREMENTS%" >> "%LOG_FILE%" 2>&1
+    )
+)
+IF ERRORLEVEL 1 (
     SET "FAILURE_MESSAGE=Application requirements installation failed."
     GOTO :fail
 )
+echo Requirements installed from "%SELECTED_REQUIREMENTS%" >> "%LOG_FILE%"
 
 IF EXIST "%PROJECT_ROOT%\requirements-windows.txt" (
     echo Installing Windows-specific requirements. >> "%LOG_FILE%"
@@ -87,20 +96,41 @@ REM External Python code is optional in LabConstrictor projects. If setup.py is
 REM bundled, install it without a temporary build environment and verify that
 REM the generated import package is usable. Otherwise continue without it.
 IF EXIST "%PROJECT_ROOT%\setup.py" (
-    echo Found setup.py, installing PROJECT_NAME package locally without build isolation. >> "%LOG_FILE%"
+    echo Found setup.py, installing LabConstrictorPlayground package locally without build isolation. >> "%LOG_FILE%"
     "%PYTHON_EXE%" -m pip install --no-deps --no-build-isolation "%PROJECT_ROOT%" >> "%LOG_FILE%" 2>&1
     IF ERRORLEVEL 1 (
-        SET "FAILURE_MESSAGE=PROJECT_NAME package installation failed."
+        SET "FAILURE_MESSAGE=LabConstrictorPlayground package installation failed."
         GOTO :fail
     )
 
-    "%PYTHON_EXE%" -c "import PYTHON_PROJ_NAME; print('PROJECT_NAME import successful:', PYTHON_PROJ_NAME.__file__)" >> "%LOG_FILE%" 2>&1
+    "%PYTHON_EXE%" -c "import labconstrictor_playground; print('LabConstrictorPlayground import successful:', labconstrictor_playground.__file__)" >> "%LOG_FILE%" 2>&1
     IF ERRORLEVEL 1 (
-        SET "FAILURE_MESSAGE=Installed PROJECT_NAME package could not be imported as PYTHON_PROJ_NAME."
+        SET "FAILURE_MESSAGE=Installed LabConstrictorPlayground package could not be imported as labconstrictor_playground."
         GOTO :fail
     )
 ) ELSE (
     echo No setup.py detected; this project does not bundle an optional Python package. >> "%LOG_FILE%"
+)
+
+REM Optional: expose the app's tools to Napari, Fiji and the command line (LabConstrictor tools bridge).
+REM If the app's package ships a module named <package>_lc_tools, install labconstrictor-tools and register that module.
+REM This step must never fail the installation. LC_TOOLS_SPEC can point to another source (wheel, git URL, mirror).
+REM Default source: the GitHub archive of labconstrictor-tools (a plain zip: no git needed on the user's computer), because the package
+REM is not on PyPI yet. Once it is, use "labconstrictor-tools" here.
+IF NOT DEFINED LC_TOOLS_SPEC SET "LC_TOOLS_SPEC=https://github.com/CellMigrationLab/LabConstrictor-Tools/archive/refs/heads/main.zip"
+SET "LC_APP_VERSION="
+IF EXIST "%PROJECT_ROOT%\construct.yaml" FOR /F "usebackq tokens=1,* delims=: " %%A IN (`findstr /B /C:"version:" "%PROJECT_ROOT%\construct.yaml"`) DO SET "LC_APP_VERSION=%%~B"
+IF NOT DEFINED LC_APP_VERSION (
+    SET "LC_APP_VERSION=0"
+    echo WARNING: no version: line at the start of a line in construct.yaml - registering the tools with version 0. >> "%LOG_FILE%"
+)
+"%PYTHON_EXE%" -c "import importlib.util, sys; sys.exit(0 if importlib.util.find_spec('labconstrictor_playground_lc_tools') else 1)" >> "%LOG_FILE%" 2>&1
+IF NOT ERRORLEVEL 1 (
+    echo Found labconstrictor_playground_lc_tools: registering the tools of LabConstrictorPlayground for Napari and Fiji. >> "%LOG_FILE%"
+    REM LC_TOOLS_SPEC goes to pip as one argument through Python: cmd.exe never re-parses it (a quote or & in it cannot run anything).
+    "%PYTHON_EXE%" -c "import os, subprocess, sys; sys.exit(subprocess.call([sys.executable, '-m', 'pip', 'install', os.environ['LC_TOOLS_SPEC']]))" >> "%LOG_FILE%" 2>&1
+    IF NOT ERRORLEVEL 1 "%PYTHON_EXE%" -m labconstrictor_tools register --name "LabConstrictorPlayground" --prefix "%PREFIX%" --module labconstrictor_playground_lc_tools --version "%LC_APP_VERSION%" --display-name "LabConstrictorPlayground" >> "%LOG_FILE%" 2>&1
+    IF ERRORLEVEL 1 echo WARNING: tool registration failed - see the pip and register output above in this file; LabConstrictorPlayground itself is installed. >> "%LOG_FILE%"
 )
 
 "%PYTHON_EXE%" "%PROJECT_ROOT%\include_path.py" --path "%PREFIX%" --files "%PROJECT_ROOT%\notebook_launcher.json" --keyword "BASE_PATH_KEYWORD" >> "%LOG_FILE%" 2>&1
@@ -138,19 +168,19 @@ IF ERRORLEVEL 1 (
     GOTO :fail
 )
 
-"%PYTHON_EXE%" -c "from menuinst.api import install; import os; print(install(os.path.join(r'%PREFIX%', 'PROJECT_NAME', 'notebook_launcher.json')))" >> "%LOG_FILE%" 2>&1
+"%PYTHON_EXE%" -c "from menuinst.api import install; import os; print(install(os.path.join(r'%PREFIX%', 'LabConstrictorPlayground', 'notebook_launcher.json')))" >> "%LOG_FILE%" 2>&1
 IF ERRORLEVEL 1 (
     SET "FAILURE_MESSAGE=Application shortcut creation failed."
     GOTO :fail
 )
 
-SET "ARP_KEY=HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\UNDERSCORED_PROJECT_NAME"
-SET "UNINSTALL_EXE=%PREFIX%\Uninstall-UNDERSCORED_PROJECT_NAME.exe"
+SET "ARP_KEY=HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\LabConstrictorPlayground"
+SET "UNINSTALL_EXE=%PREFIX%\Uninstall-LabConstrictorPlayground.exe"
 SET "DISPLAY_ICON=%PROJECT_ROOT%\logo.ico"
-SET "DISPLAY_VERSION=VERSION_NUMBER"
-SET "PUBLISHER=GITHUB_OWNER"
-echo Registering PROJECT_NAME in Windows Apps list >> "%LOG_FILE%"
-reg add "%ARP_KEY%" /v DisplayName /d "PROJECT_NAME" /f >> "%LOG_FILE%" 2>&1
+SET "DISPLAY_VERSION=0.1.0"
+SET "PUBLISHER=CellMigrationLab"
+echo Registering LabConstrictorPlayground in Windows Apps list >> "%LOG_FILE%"
+reg add "%ARP_KEY%" /v DisplayName /d "LabConstrictorPlayground" /f >> "%LOG_FILE%" 2>&1
 reg add "%ARP_KEY%" /v DisplayVersion /d "%DISPLAY_VERSION%" /f >> "%LOG_FILE%" 2>&1
 reg add "%ARP_KEY%" /v Publisher /d "%PUBLISHER%" /f >> "%LOG_FILE%" 2>&1
 reg add "%ARP_KEY%" /v InstallLocation /d "%PREFIX%" /f >> "%LOG_FILE%" 2>&1
