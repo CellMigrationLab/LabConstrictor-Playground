@@ -1,27 +1,27 @@
 {
   "$schema": "https://schemas.conda.org/menuinst/menuinst-1-1-3.schema.json",
-  "menu_name": "PROJECT_NAME",
+  "menu_name": "LabConstrictorPlayground",
   "menu_items": [
     {
-      "name": "PROJECT_NAME",
-      "description": "Launch PROJECT_NAME in its packaged JupyterLab environment.",
+      "name": "LabConstrictorPlayground",
+      "description": "Launch LabConstrictorPlayground in its packaged JupyterLab environment.",
       "activate": true,
       "terminal": true,
       "working_dir": "{{ HOME }}",
       "command": [
         "{{ PYTHON }}",
-        "{{ PREFIX }}/PROJECT_NAME/launch_jupyter.py",
-        "{{ PREFIX }}/PROJECT_NAME/notebooks/Welcome.ipynb"
+        "{{ PREFIX }}/LabConstrictorPlayground/launch_jupyter.py",
+        "{{ PREFIX }}/LabConstrictorPlayground/notebooks/Welcome.ipynb"
       ],
       "platforms": {
         "win": {
-          "icon": "ICON_ICO_IMAGE_PATH"
+          "icon": "BASE_PATH_KEYWORD/LabConstrictorPlayground/labconstrictor_playground.ico"
         },
         "linux": {
-          "icon": "ICON_IMAGE_PATH"
+          "icon": "BASE_PATH_KEYWORD/LabConstrictorPlayground/labconstrictor_playground.png"
         },
         "osx": {
-          "icon": "ICON_ICNS_IMAGE_PATH"
+          "icon": "BASE_PATH_KEYWORD/LabConstrictorPlayground/labconstrictor_playground.icns"
         }
       }
     }

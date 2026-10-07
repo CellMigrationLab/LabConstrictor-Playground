@@ -1,69 +1,53 @@
-# LabConstrictor
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20758747.svg)](https://doi.org/10.5281/zenodo.20758747)
-![LabConstrictor Comic](https://github.com/CellMigrationLab/LabConstrictor/blob/doc_source/comic.png)
+<div align="center">
 
-**LabConstrictor** turns your Jupyter notebooks into **installable desktop applications**. This lets users launch your work right away, without needing to use Python, pip, or any terminal commands.
+<img src="app/logo/logo.png" width="420" alt="LabConstrictor Playground logo"/>
 
-This GitHub template handles everything for you. It packages your notebooks, builds installers for different platforms, and provides a simple, user-friendly **Welcome dashboard**. Your users can open your app with a double-click, while you keep a versioned, reproducible workflow.
+# LabConstrictor Playground
 
-## 🎯 Who is this for?
+**Is this computer, this installation and its GPU in order? Does every LabConstrictor feature work in Napari, Fiji and QuPath?** One button answers, and the answer can be pasted into an issue.
 
-LabConstrictor is ideal for:
-- Researchers sharing reproducible analysis pipelines or lab tools.
-- Developers shipping interactive notebooks to non-technical users.
-- Educators running workshops where setup time must be near zero.
+</div>
 
+---
 
-## ✨ LabConstrictor's Features 
+## What it is for
 
-* **Easy Configuration**: Includes a web form to easily configure repo settings, manage dependencies, and brand your application without manual editing.
-* **Cross-Platform**: Automatically builds `.exe` (Windows), `.pkg` (macOS), and `.sh` (Linux) installers.
-* **Auto-Hide Code**: Code cells can be hidden, allowing users to see a clean, "app-like" interface, but still being able to reveal code if needed.
-* **Dependency Guardrails**: automatic workflows merge and validate requirements, catching conflicts *before* you release.
-* **TLS-Resilient Launching**: verified certificate fallback keeps packaged JupyterLab apps usable on systems with malformed certificate-store entries.
-* **Version Control**: Helper cells track versions and alert users when an update is available.
+- **Testers** install it like any LabConstrictor app and press **Check everything**. They get a short readout (a tick, a warning or a cross per layer, with *what to do* beside each cross) and a `report.json` to attach to an issue. This is how we learn what works on Windows and macOS, with or without a GPU.
+- **Developers** use its tools as a fixed set of cases for the tools bridge: a dropdown that follows another tool, replace, messages, points, channels, large results, cancel, a crash, no memory, a tool that ignores Cancel.
+- **App authors** get the same checks for their own app in three lines (`labconstrictor_tools.diagnostics`, see the Tools repository).
 
-## 📸 The User Experience
+## The tools (Napari, Fiji, QuPath, command line)
 
-![LabConstrictor Summary GIF](https://github.com/CellMigrationLab/LabConstrictor/blob/doc_source/Summary.gif)
+| Tool | What it does |
+|---|---|
+| **Check everything** | Machine (memory, disk, write access, path problems), worker, GPU tools (`nvidia-smi`, Apple chip), PyTorch (CUDA, Apple Metal, ROCm), a speed test of the same convolution and matrix product on the CPU and every GPU (the results must agree), what the installer decided about the GPU build, and optionally the internet. Returns a readout, a table of details and the report file. |
+| **List the devices** | `cpu`, `cuda:0`, `mps`, whatever PyTorch can use here. Feeds the device dropdown below. |
+| **Run a small test on a device** | The same test on the device chosen in a dropdown (shows the dependent dropdown and real GPU use). |
+| **Make test data** | Small files made from a seed: a 3-channel image whose channels have the means 10, 20 and 30 (a tool that receives the wrong channel is caught), an RGB image, labels, a time-lapse, a table of points. |
+| **Stress: ...** | A big image, many points (up to 2 million), a slow run with progress, a crash, no memory, a tool that ignores Cancel. The host must survive each of them and say what happened. |
 
-## 🚀 Before Getting Started
+## Install
 
-Please read the [Before Getting Started Guide](.tools/docs/before_getting_started.md) to familiarise yourself with the LabConstrictor workflow and requirements.
+Download the installer for your system from the [Releases](https://github.com/CellMigrationLab/LabConstrictor-Playground/releases) page (Windows, Apple Silicon Mac, Linux; Intel Macs are not supported) and run it. The installer detects an NVIDIA GPU and installs the matching PyTorch (CUDA) build; if that fails it falls back to the CPU build and records what happened in its log, which **Check everything** reads back to you. Apple Silicon uses Metal ("mps") with the standard build.
 
-## ⚡ Quick Start
+The tools appear in Napari (**Plugins > LabConstrictor tools**), Fiji (**Plugins > LabConstrictor > LabConstrictor Tools...**) and QuPath once those hosts are set up; their install pages: [Napari](https://github.com/CellMigrationLab/napari-labconstrictor#install), [Fiji](https://github.com/CellMigrationLab/LabConstrictor-Fiji#install), [QuPath](https://github.com/CellMigrationLab/LabConstrictor-QuPath#install). From a terminal:
 
-Go from notebook to installer in minutes.
+```
+<install folder>/bin/python -m labconstrictor_tools run LabConstrictorPlayground check_everything
+```
 
-#### 1. [**Create a New Repository from this Template**](.tools/docs/create_repository.md)
-#### 2. [**Enable automatic template updates**](.tools/docs/template_synchronization.md)
-#### 3. [**Initialise your repository**](.tools/docs/initialise_repository.md)
-#### 4. [*(Optional)* **Upload external code**](.tools/docs/external_code_upload.md)
-#### 5. [**Upload Your Notebooks**](.tools/docs/notebook_upload.md) 
-#### 6. [**Create Executable Installers**](.tools/docs/executable_creation.md)
-> **Requirements:** You only need a GitHub account and the Jupyter notebooks you want to distribute.
+## Reading the answer
 
-Need help writing notebooks that run well in both Colab and JupyterLab? See the [notebook portability guide](.tools/docs/notebook_portability.md).
+| Mark | Meaning |
+|---|---|
+| ✔ | fine |
+| ⚠ | works, but something will bite later (low disk, a long path on Windows, the GPU build fell back to CPU) |
+| ✖ | broken; the line below it says what to do (for example "the driver is too old for this CUDA build: update the NVIDIA driver") |
 
-## 🔄 Automatic Template Updates
+Honest limits: OpenCL on macOS is deprecated by Apple and ROCm (AMD) works on Linux only; this first version checks PyTorch only. TensorFlow is checked inside the apps that use it.
 
-LabConstrictor can prepare pull requests that keep generated repositories aligned with improvements in this template, including updates to GitHub Actions workflows. Complete the one-time [automatic synchronization setup](.tools/docs/template_synchronization.md) after creating your repository.
+## Developers
 
-## 🤝 Contributing
+`src/labconstrictor_playground` holds the code (`checks.py`, `data.py`, `stress.py`), `src/labconstrictor_playground_lc_tools` the tool declarations, `lc_tests/` the tool cases (see its README), `tests/test_playground.py` the unit tests. The checks themselves are in [labconstrictor-tools](https://github.com/CellMigrationLab/LabConstrictor-Tools) (`labconstrictor_tools.diagnostics`), so every app can reuse them.
 
-We welcome contributions, including bug fixes, UX improvements, or new packaging strategies.
-Please read the [Contributing Guidelines](.github/CONTRIBUTING.md) before submitting PRs.
-
-## 📢 Community
-
-**Using LabConstrictor?**
-We’d love to feature your project! [Open an issue](https://github.com/YOUR_USERNAME/LabConstrictor/issues) to let us know about your use case.
-
-## 📚 Use Cases
-
-People have already used LabConstrictor to package their tools in apps. Check out the [Use Cases](.tools/docs/use_cases.md) to see examples of what’s possible.
-
-## ✍️ Citation
-If you use LabConstrictor in your research, please cite the project to support its development:
-
-Iván Hidalgo-Cenalmor, Marcela Xiomara Rivera Pineda, Bruno M. Saraiva, Ricardo Henriques, and Guillaume Jacquemet. **Packaging Jupyter notebooks as installable desktop apps using LabConstrictor. arXiv preprint 2026** DOI: https://doi.org/10.48550/arXiv.2603.10704
+Built from the [LabConstrictor](https://github.com/CellMigrationLab/LabConstrictor) template (see `.tools/docs`).
