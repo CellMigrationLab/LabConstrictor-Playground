@@ -2,6 +2,10 @@
 
 Playground provides small, reproducible tools for checking whether LabConstrictor can start an application, exchange data with a host and recover from failures.
 
+## Scientific applications
+
+For applications you can install, see [Playground](https://github.com/CellMigrationLab/LabConstrictor-Playground), [NucleiSky](https://github.com/CellMigrationLab/NucleiSky), [VLab4Mic desktop](https://github.com/CellMigrationLab/LabConstrictor-VLab4Mic) and [CellTracksColab desktop](https://github.com/CellMigrationLab/CellTracksColab_LabConstrictor). The corresponding README links to installation instructions and explains which host workflows have been documented. Only tools registered by the installed application appear in the bridge.
+
 ## First: run Feature tour
 
 Open Playground from Fiji, Napari or QuPath and select **Feature tour**. Leave the image input unset to use its built-in example.
