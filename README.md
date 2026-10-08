@@ -1,17 +1,17 @@
 # LabConstrictor Playground
 
-**A small test application for the LabConstrictor tools bridge.**
+**Test LabConstrictor installations and host integrations.**
 
-Playground helps answer two different questions:
+Playground has two jobs:
 
 1. **Can this installation run its tools?** Check the machine, application worker, available GPU libraries and a small numerical benchmark.
 2. **Does a host handle the tools correctly?** Exercise images, regions, channels, tables, points, outlines, progress and deliberate failure cases from Napari, Fiji or QuPath.
 
-Those are not the same test. A successful machine check does **not** prove that every Fiji, Napari or QuPath integration works.
+A passing machine check does **not** establish that the Fiji, Napari or QuPath integrations work.
 
 ![LabConstrictor Playground](app/logo/logo.png)
 
-## Start here: Feature tour
+## First run: Feature tour
 
 Open Playground from a supported LabConstrictor host and select **Feature tour**.
 
@@ -36,7 +36,7 @@ A warning or failure should explain what was checked and what to try next. If a 
 
 The checks are built on the Toolkit's reusable `labconstrictor_tools.diagnostics` module. Playground also looks for installation-log information about CPU/GPU package choices.
 
-### What a passing report does—and does not—mean
+### What a passing report means
 
 A passing report is evidence that the **specific checks it ran** succeeded on that machine. It is not a certification of the installation, proof that a scientific tool is accurate, or a full test of all three graphical hosts.
 
@@ -62,7 +62,7 @@ For host integration, use **Feature tour**, the other example tools and the host
 
 Get the installer for your system from [Releases](https://github.com/CellMigrationLab/LabConstrictor-Playground/releases).
 
-The project targets Windows, Linux and Apple Silicon Macs; **Intel Macs are not supported**. Availability of a release does not imply that every GPU or host combination has been tested.
+Installers target Windows, Linux and Apple Silicon Macs; **Intel Macs are not supported**. Availability of a release does not imply that every GPU or host combination has been tested.
 
 The installer sets up the application's Python environment and registers its tools. An NVIDIA installation may attempt a CUDA-enabled PyTorch build and fall back to CPU packages if installation fails; Playground's installation-log check reports that decision when the log is available.
 
