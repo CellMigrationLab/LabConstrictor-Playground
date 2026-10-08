@@ -1,161 +1,274 @@
 [
- {
-  "tool": "list_devices",
-  "comment": "the device list always has the CPU",
-  "expect": {
-   "results": {
-    "values": {
-     "pytorch": "installed"
+  {
+    "tool": "list_devices",
+    "comment": "the device list always has the CPU",
+    "expect": {
+      "results": {
+        "values": {
+          "pytorch": "installed"
+        }
+      }
     }
-   }
-  }
- },
- {
-  "tool": "check_everything",
-  "inputs": {
-   "run_benchmark": true,
-   "check_internet": false
   },
-  "comment": "the whole chain on this machine: a readout, a table, a report file",
-  "expect": {
-   "max_seconds": 120,
-   "results": {
-    "readout": {
-     "contains": "checks:"
+  {
+    "tool": "check_everything",
+    "inputs": {
+      "run_benchmark": true,
+      "check_internet": false
     },
-    "details": {
-     "columns": [
-      "layer",
-      "name",
-      "status",
-      "detail",
-      "fix"
-     ]
+    "comment": "the whole chain on this machine: a readout, a table, a report file",
+    "expect": {
+      "max_seconds": 120,
+      "results": {
+        "readout": {
+          "contains": "checks:"
+        },
+        "details": {
+          "columns": [
+            "layer",
+            "name",
+            "status",
+            "detail",
+            "fix"
+          ]
+        }
+      }
     }
-   }
-  }
- },
- {
-  "tool": "run_on_device",
-  "inputs": {
-   "device": "cpu",
-   "size": 128,
-   "repeats": 2
   },
-  "comment": "the same test on the CPU",
-  "expect": {
-   "results": {
-    "values": {
-     "device": "cpu"
+  {
+    "tool": "run_on_device",
+    "inputs": {
+      "device": "cpu",
+      "size": 128,
+      "repeats": 2
+    },
+    "comment": "the same test on the CPU",
+    "expect": {
+      "results": {
+        "values": {
+          "device": "cpu"
+        }
+      }
     }
-   }
-  }
- },
- {
-  "tool": "run_on_device",
-  "inputs": {
-   "device": "cuda:7",
-   "size": 128,
-   "repeats": 1
   },
-  "comment": "a device that is not here is refused with the list of the ones that are",
-  "expect": {
-   "status": "FAILED",
-   "code": "unknown_device",
-   "message_contains": "cpu"
-  }
- },
- {
-  "tool": "make_test_data",
-  "inputs": {
-   "folder": "fixtures/data",
-   "kind": "all",
-   "size": 64
-  },
-  "comment": "every kind of test file",
-  "expect": {
-   "results": {
-    "files": {
-     "contains": "three_channels"
+  {
+    "tool": "run_on_device",
+    "inputs": {
+      "device": "cuda:7",
+      "size": 128,
+      "repeats": 1
+    },
+    "comment": "a device that is not here is refused with the list of the ones that are",
+    "expect": {
+      "status": "FAILED",
+      "code": "unknown_device",
+      "message_contains": "cpu"
     }
-   }
-  }
- },
- {
-  "tool": "stress_big_image",
-  "inputs": {
-   "megabytes": 4
   },
-  "comment": "a large 16-bit image",
-  "expect": {
-   "results": {
-    "big": {
-     "dtype": "uint16"
+  {
+    "tool": "make_test_data",
+    "inputs": {
+      "folder": "fixtures/data",
+      "kind": "all",
+      "size": 64
+    },
+    "comment": "every kind of test file",
+    "expect": {
+      "results": {
+        "files": {
+          "contains": "three_channels"
+        }
+      }
     }
-   }
-  }
- },
- {
-  "tool": "stress_many_points",
-  "inputs": {
-   "count": 5000
   },
-  "comment": "many points",
-  "expect": {
-   "results": {
-    "points": {
-     "rows": 5000,
-     "columns": [
-      "y",
-      "x",
-      "score"
-     ]
+  {
+    "tool": "stress_big_image",
+    "inputs": {
+      "megabytes": 4
+    },
+    "comment": "a large 16-bit image",
+    "expect": {
+      "results": {
+        "big": {
+          "dtype": "uint16"
+        }
+      }
     }
-   }
-  }
- },
- {
-  "tool": "stress_slow",
-  "inputs": {
-   "seconds": 2
   },
-  "comment": "a slow run reports progress",
-  "expect": {
-   "progress_events_min": 1,
-   "results": {
-    "values": {
-     "worked_seconds": {
-      "approx": 2.0,
-      "tol": 1.0
-     }
+  {
+    "tool": "stress_many_points",
+    "inputs": {
+      "count": 5000
+    },
+    "comment": "many points",
+    "expect": {
+      "results": {
+        "points": {
+          "rows": 5000,
+          "columns": [
+            "y",
+            "x",
+            "score"
+          ]
+        }
+      }
     }
-   }
-  }
- },
- {
-  "tool": "stress_slow",
-  "inputs": {
-   "seconds": 30
   },
-  "cancel_after_s": 2,
-  "comment": "Cancel stops a polite tool",
-  "expect": {
-   "status": "CANCELED",
-   "max_seconds": 20
+  {
+    "tool": "stress_slow",
+    "inputs": {
+      "seconds": 2
+    },
+    "comment": "a slow run reports progress",
+    "expect": {
+      "progress_events_min": 1,
+      "results": {
+        "values": {
+          "worked_seconds": {
+            "approx": 2.0,
+            "tol": 1.0
+          }
+        }
+      }
+    }
+  },
+  {
+    "tool": "stress_slow",
+    "inputs": {
+      "seconds": 30
+    },
+    "cancel_after_s": 2,
+    "comment": "Cancel stops a polite tool",
+    "expect": {
+      "status": "CANCELED",
+      "max_seconds": 20
+    }
+  },
+  {
+    "tool": "stress_out_of_memory",
+    "comment": "no memory: a readable failure, not a crash",
+    "expect": {
+      "status": "FAILED"
+    }
+  },
+  {
+    "tool": "stress_crash",
+    "comment": "the worker ends without a message",
+    "expect": {
+      "status": "CRASHED"
+    }
+  },
+  {
+    "tool": "feature_tour",
+    "inputs": {},
+    "expect": {
+      "max_seconds": 120,
+      "results": {
+        "summary": {
+          "contains": "16"
+        },
+        "outlines": {
+          "features": 16
+        },
+        "centres": {
+          "rows": 16,
+          "columns": [
+            "y",
+            "x",
+            "label"
+          ]
+        },
+        "measurements": {
+          "rows": 16
+        }
+      }
+    }
+  },
+  {
+    "tool": "feature_tour",
+    "inputs": {
+      "image": "fixtures/data/demo_blobs.tif",
+      "side_note": "hello \u00b5\u2192\u2713"
+    },
+    "expect": {
+      "results": {
+        "summary": {
+          "contains": "hello \u00b5\u2192\u2713"
+        },
+        "outlines": {
+          "features": 16
+        }
+      }
+    }
+  },
+  {
+    "tool": "feature_tour",
+    "inputs": {
+      "image": "fixtures/data/demo_blobs.tif",
+      "region": "fixtures/data/top_half_region.tif"
+    },
+    "expect": {
+      "results": {
+        "summary": {
+          "contains": "inside the region"
+        },
+        "outlines": {
+          "features": 11
+        },
+        "centres": {
+          "rows": 11
+        }
+      }
+    }
+  },
+  {
+    "tool": "feature_tour",
+    "inputs": {
+      "image": "fixtures/data/demo_blobs.tif",
+      "look_for": "dark"
+    },
+    "expect": {
+      "results": {
+        "outlines": {
+          "features": 3
+        }
+      }
+    }
+  },
+  {
+    "tool": "feature_tour",
+    "inputs": {
+      "threshold": 1.0,
+      "min_size_px": 500
+    },
+    "expect": {
+      "status": "FAILED",
+      "code": "no_result",
+      "message_contains": "No blob found"
+    }
+  },
+  {
+    "tool": "feature_tour",
+    "inputs": {
+      "image": "fixtures/data/demo_blobs.tif",
+      "region": "fixtures/data/empty_region.tif"
+    },
+    "expect": {
+      "status": "FAILED",
+      "code": "empty_region",
+      "message_contains": "empty"
+    }
+  },
+  {
+    "tool": "feature_tour",
+    "inputs": {
+      "image": "fixtures/data/demo_blobs.tif",
+      "region": "fixtures/data/wrong_size_region.tif"
+    },
+    "expect": {
+      "status": "FAILED",
+      "code": "bad_input",
+      "message_contains": "size of the image"
+    }
   }
- },
- {
-  "tool": "stress_out_of_memory",
-  "comment": "no memory: a readable failure, not a crash",
-  "expect": {
-   "status": "FAILED"
-  }
- },
- {
-  "tool": "stress_crash",
-  "comment": "the worker ends without a message",
-  "expect": {
-   "status": "CRASHED"
-  }
- }
 ]

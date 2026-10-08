@@ -28,7 +28,7 @@ def test_the_declarations_stay_light_and_are_valid():
     done = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, env={"PYTHONPATH": str(ROOT / "src") + ":" + ":".join(sys.path)})
     assert done.returncode == 0, done.stderr
     assert done.stdout.split() == sorted(
-        ["check_everything", "list_devices", "make_test_data", "run_on_device", "stress_big_image", "stress_crash", "stress_hang", "stress_many_points", "stress_out_of_memory", "stress_slow"]
+        ["check_everything", "feature_tour", "list_devices", "make_test_data", "run_on_device", "stress_big_image", "stress_crash", "stress_hang", "stress_many_points", "stress_out_of_memory", "stress_slow"]
     )
 
 

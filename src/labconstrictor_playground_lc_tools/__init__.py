@@ -8,26 +8,38 @@ checks inside the functions, so that listing the tools stays instant (`import to
 """
 
 from pathlib import Path
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Optional
 
 from labconstrictor_tools import (
     Advanced,
+    ApplyTo,
+    Axes,
     ChoicesFrom,
+    ClearAfterRun,
+    Collapsed,
     Description,
     FileOut,
     Folder,
     Group,
+    Image,
     ImageOut,
     Label,
+    Labels,
+    LabelsOut,
     Max,
     MessageOut,
     Min,
     Name,
+    PickChannel,
     PointsOut,
+    RegionOf,
     Replace,
     Scalars,
+    ShapesOut,
     TableOut,
     ToolError,
+    Unit,
+    Widget,
     check_cancel,
     progress,
     tool,
@@ -118,6 +130,50 @@ def make_test_data(
     written = make(folder, kind, size)
     names = "\n".join("- %s: %s" % (name, path) for name, path in written.items())
     return "Wrote %d file(s) into %s:\n%s" % (len(written), folder, names), {"folder": str(folder), "files": ", ".join(p.name for p in written.values())}
+
+
+# ------------------------------------------------------------------------------------------------ the feature tour
+@tool("Feature tour")
+def feature_tour(
+    image: Annotated[
+        Optional[Image], Axes("YX"), PickChannel(), Group("Image"),
+        Description("A 2D image (pick its channel in the host). Leave it unset to use a built-in demo image with round blobs, rings (a hole) and blobs in two parts"),
+    ] = None,
+    region: Annotated[
+        Optional[Labels], Axes("YX"), RegionOf("image"), Group("Image"),
+        Description("Only keep the blobs whose centre is inside this region: the host fills it from the selection (a Shapes layer, a ROI, annotations)"),
+    ] = None,
+    look_for: Annotated[Literal["bright", "dark"], Widget("radio"), Group("Segmentation"), Description("Blobs brighter or darker than the background")] = "bright",
+    threshold: Annotated[float, Min(0), Max(1), Widget("slider"), Group("Segmentation"), Description("Fraction of the intensity range that separates blobs from background")] = 0.5,
+    min_size_px: Annotated[int, Min(1), Max(500), Widget("slider"), Unit("px"), Label("Minimum size"), Group("Segmentation"), Description("Blobs with fewer pixels are removed")] = 20,
+    side_note: Annotated[
+        Optional[str], Group("Extras"), Collapsed(), ClearAfterRun(),
+        Description("A free text shown in the summary. This group starts folded, and the box empties itself after a run"),
+    ] = None,
+) -> tuple[
+    Annotated[LabelsOut, Name("blobs"), ApplyTo("image"), Replace()],
+    Annotated[ShapesOut, Name("outlines"), ApplyTo("image"), Replace()],
+    Annotated[PointsOut, Name("centres"), ApplyTo("image"), Replace()],
+    Annotated[TableOut, Name("measurements"), Replace()],
+    Annotated[MessageOut, Name("summary")],
+]:
+    """Label the blobs of an image and return them in every form a host can show: labels, outlines, points, a table and a message."""
+    import pandas as pd
+    from labconstrictor_playground.tour import demo_image, segment
+    from labconstrictor_tools.shapes import labels_to_shapes
+
+    progress(0.1, "preparing the image" if image is not None else "making the demo image")
+    source = image if image is not None else demo_image()
+    check_cancel()
+    labels, rows = segment(source, threshold, look_for, min_size_px, region)
+    progress(0.7, "outlining %d blob(s)" % len(rows))
+    table = pd.DataFrame(rows)
+    text = "Found **%d** blob(s)%s." % (len(rows), " inside the region" if region is not None else "")
+    if image is None:
+        text += " (the built-in demo image)"
+    if side_note:
+        text += "\n\n> " + side_note.replace("\n", " ")
+    return labels, labels_to_shapes(labels), table[["y", "x", "label", "area_px"]], table, text
 
 
 # ------------------------------------------------------------------------------------------------ stress (what a host must survive)
