@@ -1,54 +1,110 @@
-<div align="center">
-
-<img src="app/logo/logo.png" width="420" alt="LabConstrictor Playground logo"/>
-
 # LabConstrictor Playground
 
-**Is this computer, this installation and its GPU in order? Does every LabConstrictor feature work in Napari, Fiji and QuPath?** One button answers, and the answer can be pasted into an issue.
+**Test LabConstrictor installations and host integrations.**
 
-</div>
+Playground has two jobs:
 
----
+1. **Can this installation run its tools?** Check the machine, application worker, available GPU libraries and a small numerical benchmark.
+2. **Does a host handle the tools correctly?** Exercise images, regions, channels, tables, points, outlines, progress and deliberate failure cases from Napari, Fiji or QuPath.
 
-## What it is for
+A passing machine check does **not** establish that the Fiji, Napari or QuPath integrations work.
 
-- **Testers** install it like any LabConstrictor app and press **Check everything**. They get a short readout (a tick, a warning or a cross per layer, with *what to do* beside each cross) and a `report.json` to attach to an issue. This is how we learn what works on Windows and macOS, with or without a GPU.
-- **Developers** use its tools as a fixed set of cases for the tools bridge: a dropdown that follows another tool, replace, messages, points, channels, large results, cancel, a crash, no memory, a tool that ignores Cancel.
-- **App authors** get the same checks for their own app in three lines (`labconstrictor_tools.diagnostics`, see the Tools repository).
+![LabConstrictor Playground](app/logo/logo.png)
 
-## The tools (Napari, Fiji, QuPath, command line)
+## First run: Feature tour
 
-| Tool | What it does |
+Open Playground from a supported LabConstrictor host and select **Feature tour**.
+
+You can leave the image input unset. Playground makes a small test image, segments its blobs and returns:
+
+- a label image and object outlines;
+- points at object centres;
+- a measurements table;
+- a short message describing the result.
+
+Change the threshold or minimum object size and run again. This exercises the host's controls and result handling without downloading microscopy data. You can also supply your own image, choose a channel where the host supports it, or use a selected region.
+
+**Feature tour is a functional example, not a validated biological segmentation method.**
+
+## Check this installation
+
+Run **Check everything** to inspect the computer and the application's runtime. It reports machine information, writable paths, the worker, GPU utilities and libraries, and—if enabled—a small CPU/GPU numerical benchmark. An optional network check probes package and model download sites.
+
+The result includes a readable summary, a details table and a `report.json` file. A benchmark figure is also written when timing data are available.
+
+A warning or failure should explain what was checked and what to try next. If a probe cannot run, that is not evidence that the missing component works.
+
+The checks are built on the Toolkit's reusable `labconstrictor_tools.diagnostics` module. Playground also looks for installation-log information about CPU/GPU package choices.
+
+### What a passing report means
+
+A passing report is evidence that the **specific checks it ran** succeeded on that machine. It is not a certification of the installation, proof that a scientific tool is accurate, or a full test of all three graphical hosts.
+
+For host integration, use **Feature tour**, the other example tools and the host-specific tests. Include the host name, operating system and application version when reporting an issue.
+
+## Other tools
+
+| Tool | What it exercises |
 |---|---|
-| **Check everything** | Machine (memory, disk, write access, path problems), worker, GPU tools (`nvidia-smi`, Apple chip), PyTorch (CUDA, Apple Metal, ROCm), a speed test of the same convolution and matrix product on the CPU and every GPU (the results must agree), what the installer decided about the GPU build, and optionally the internet. Returns a readout, a table of details and the report file. |
-| **List the devices** | `cpu`, `cuda:0`, `mps`, whatever PyTorch can use here. Feeds the device dropdown below. |
-| **Run a small test on a device** | The same test on the device chosen in a dropdown (shows the dependent dropdown and real GPU use). |
-| **Make test data** | Small files made from a seed: a 3-channel image whose channels have the means 10, 20 and 30 (a tool that receives the wrong channel is caught), an RGB image, labels, a time-lapse, a table of points. |
-| **Feature tour** | One small segmentation that uses every control and output of the bridge: a channel picker, "use the selection" as a region, radio buttons and sliders, a folded group with a box that empties itself, and labels, outlines, points, a table and a message as results (each run replaces the last). Run it with no image to use a built-in demo image (round blobs, rings with a hole, blobs in two parts). |
-| **Stress: ...** | A big image, many points (up to 2 million), a slow run with progress, a crash, no memory, a tool that ignores Cancel. The host must survive each of them and say what happened. |
+| **List the devices** | Which PyTorch devices are available to the application |
+| **Run a small test on a device** | A dependent device dropdown and actual computation on the selected device |
+| **Make test data** | Reproducible files with channels, RGB, labels, time-lapse and points |
+| **Stress: a big image** | Large image results and host memory handling |
+| **Stress: many points** | Large point layers and tables |
+| **Stress: slow run with progress** | Progress display and cooperative cancellation |
+| **Stress: crash the worker** | Host recovery after an intentional worker crash |
+| **Stress: no memory** | Failure reporting under simulated memory exhaustion |
+| **Stress: ignore Cancel** | Whether the host eventually terminates an unresponsive worker |
+
+**Do not use the stress tools on unsaved work.** Some deliberately crash a worker, allocate substantial memory or ignore cancellation. Start with Feature tour and the diagnostics; use stress tests only when checking host behavior.
 
 ## Install
 
-Download the installer for your system from the [Releases](https://github.com/CellMigrationLab/LabConstrictor-Playground/releases) page (Windows, Apple Silicon Mac, Linux; Intel Macs are not supported) and run it. The installer detects an NVIDIA GPU and installs the matching PyTorch (CUDA) build; if that fails it falls back to the CPU build and records what happened in its log, which **Check everything** reads back to you. Apple Silicon uses Metal ("mps") with the standard build.
+Get the installer for your system from [Releases](https://github.com/CellMigrationLab/LabConstrictor-Playground/releases).
 
-The tools appear in Napari (**Plugins > LabConstrictor tools**), Fiji (**Plugins > LabConstrictor > LabConstrictor Tools...**) and QuPath once those hosts are set up; their install pages: [Napari](https://github.com/CellMigrationLab/napari-labconstrictor#install), [Fiji](https://github.com/CellMigrationLab/LabConstrictor-Fiji#install), [QuPath](https://github.com/CellMigrationLab/LabConstrictor-QuPath#install). From a terminal:
+Installers target Windows, Linux and Apple Silicon Macs; **Intel Macs are not supported**. Availability of a release does not imply that every GPU or host combination has been tested.
 
+The installer sets up the application's Python environment and registers its tools. An NVIDIA installation may attempt a CUDA-enabled PyTorch build and fall back to CPU packages if installation fails; Playground's installation-log check reports that decision when the log is available.
+
+To use the tools in a graphical host, install the corresponding integration:
+
+- [Napari plugin](https://github.com/CellMigrationLab/napari-labconstrictor)
+- [Fiji bridge](https://github.com/CellMigrationLab/LabConstrictor-Fiji)
+- [QuPath extension](https://github.com/CellMigrationLab/LabConstrictor-QuPath)
+
+From the application's Python interpreter, you can run the diagnostics without a GUI:
+
+```bash
+<install-folder>/bin/python -m labconstrictor_tools run LabConstrictorPlayground check_everything
 ```
-<install folder>/bin/python -m labconstrictor_tools run LabConstrictorPlayground check_everything
+
+The interpreter path differs on Windows. Use the executable inside the installed Playground environment.
+
+## Report a problem
+
+Start with **Check everything**, then try **Feature tour** in the host where you saw the problem. Include the steps to reproduce it, the operating system, host version and the `report.json` file when filing an issue.
+
+A diagnostic report can contain machine and installation details. **Review it before sharing publicly**, especially paths, usernames or environment information.
+
+For more detail, see [Bridge testing with Playground](docs/TESTING_THE_BRIDGE.md).
+
+## Other applications
+
+Playground is a test application using the same manifest-driven bridge as scientific applications. After trying its example tools, you can install [Guess the Condition](https://github.com/CellMigrationLab/GuessTheCondition), [NucleiSky](https://github.com/CellMigrationLab/NucleiSky), [VLab4Mic](https://github.com/CellMigrationLab/LabConstrictor-VLab4Mic) or [CellTracksColab](https://github.com/CellMigrationLab/CellTracksColab_LabConstrictor), among others.
+
+LabConstrictor connects applications through their registered tool declarations rather than a separate integration for each application and host. Whether a given tool is useful in Napari, Fiji or QuPath depends on the workflow and how its results are displayed. A successful Playground test does not validate another application's scientific results.
+
+## For developers
+
+The scientific/test functions live in `src/labconstrictor_playground/`; the declarations exported to hosts live in `src/labconstrictor_playground_lc_tools/`. They use the same typed API as any other LabConstrictor application.
+
+The test cases are in `lc_tests/` and the Python tests in `tests/`. You can validate the declarations with:
+
+```bash
+labconstrictor-tools check --module labconstrictor_playground_lc_tools
+labconstrictor-tools test --module labconstrictor_playground_lc_tools --cases lc_tests/cases.json
 ```
 
-## Reading the answer
+The reusable machine and GPU probes are implemented in [LabConstrictor Tools](https://github.com/CellMigrationLab/LabConstrictor-Tools), not duplicated here. Playground adds the installer-specific checks and deliberately difficult example tools.
 
-| Mark | Meaning |
-|---|---|
-| ✔ | fine |
-| ⚠ | works, but something will bite later (low disk, a long path on Windows, the GPU build fell back to CPU) |
-| ✖ | broken; the line below it says what to do (for example "the driver is too old for this CUDA build: update the NVIDIA driver") |
-
-Honest limits: OpenCL on macOS is deprecated by Apple and ROCm (AMD) works on Linux only; this first version checks PyTorch only. TensorFlow is checked inside the apps that use it.
-
-## Developers
-
-`src/labconstrictor_playground` holds the code (`checks.py`, `data.py`, `stress.py`), `src/labconstrictor_playground_lc_tools` the tool declarations, `lc_tests/` the tool cases (see its README), `tests/test_playground.py` the unit tests. The checks themselves are in [labconstrictor-tools](https://github.com/CellMigrationLab/LabConstrictor-Tools) (`labconstrictor_tools.diagnostics`), so every app can reuse them.
-
-Built from the [LabConstrictor](https://github.com/CellMigrationLab/LabConstrictor) template (see `.tools/docs`).
+Built using the [LabConstrictor](https://github.com/CellMigrationLab/LabConstrictor) application template.
