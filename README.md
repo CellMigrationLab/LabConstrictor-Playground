@@ -90,9 +90,9 @@ For more detail, see [Bridge testing with Playground](docs/TESTING_THE_BRIDGE.md
 
 ## Other applications
 
-Playground is a test application, not a scientific analysis package. Once the bridge works with its example tools, you can install applications such as [Guess the Condition](https://github.com/CellMigrationLab/GuessTheCondition), [NucleiSky](https://github.com/CellMigrationLab/NucleiSky), [VLab4Mic](https://github.com/CellMigrationLab/LabConstrictor-VLab4Mic) or [CellTracksColab](https://github.com/CellMigrationLab/CellTracksColab_LabConstrictor).
+Playground is a test application using the same manifest-driven bridge as scientific applications. After trying its example tools, you can install [Guess the Condition](https://github.com/CellMigrationLab/GuessTheCondition), [NucleiSky](https://github.com/CellMigrationLab/NucleiSky), [VLab4Mic](https://github.com/CellMigrationLab/LabConstrictor-VLab4Mic) or [CellTracksColab](https://github.com/CellMigrationLab/CellTracksColab_LabConstrictor), among others.
 
-See the [Toolkit application list](https://github.com/CellMigrationLab/LabConstrictor-Tools) for installer links and reported host workflows. A successful Playground check does not validate those applications.
+LabConstrictor connects applications through their registered tool declarations rather than a separate integration for each application and host. Whether a given tool is useful in Napari, Fiji or QuPath depends on the workflow and how its results are displayed. A successful Playground test does not validate another application's scientific results.
 
 ## For developers
 
