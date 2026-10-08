@@ -92,7 +92,7 @@ For more detail, see [Bridge testing with Playground](docs/TESTING_THE_BRIDGE.md
 
 Playground is a test application, not a scientific analysis package. Once the bridge works with its example tools, you can install applications such as [Guess the Condition](https://github.com/CellMigrationLab/GuessTheCondition), [NucleiSky](https://github.com/CellMigrationLab/NucleiSky), [VLab4Mic](https://github.com/CellMigrationLab/LabConstrictor-VLab4Mic) or [CellTracksColab](https://github.com/CellMigrationLab/CellTracksColab_LabConstrictor).
 
-See the [Toolkit application list](https://github.com/CellMigrationLab/LabConstrictor-Tools#applications) for installer links and reported host workflows. A successful Playground check does not validate those applications.
+See the [Toolkit application list](https://github.com/CellMigrationLab/LabConstrictor-Tools) for installer links and reported host workflows. A successful Playground check does not validate those applications.
 
 ## For developers
 
