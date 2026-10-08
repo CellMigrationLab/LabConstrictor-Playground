@@ -3,7 +3,7 @@ set -euo pipefail
 
 LOG_FILE="$PREFIX/menuinst_debug.log"
 PYTHON_EXE="$PREFIX/bin/python"
-PROJECT_ROOT="$PREFIX/PROJECT_NAME"
+PROJECT_ROOT="$PREFIX/LabConstrictorPlayground"
 BASE_REQUIREMENTS="$PROJECT_ROOT/requirements.txt"
 GPU_REQUIREMENTS="$PROJECT_ROOT/requirements_gpu.txt"
 SELECTED_REQUIREMENTS="$BASE_REQUIREMENTS"
@@ -44,7 +44,17 @@ else
 fi
 
 echo "Installing requirements from $SELECTED_REQUIREMENTS" >> "$LOG_FILE"
-"$PYTHON_EXE" -m pip install -r "$SELECTED_REQUIREMENTS" >> "$LOG_FILE" 2>&1
+if ! "$PYTHON_EXE" -m pip install -r "$SELECTED_REQUIREMENTS" >> "$LOG_FILE" 2>&1; then
+    if [ "$SELECTED_REQUIREMENTS" != "$BASE_REQUIREMENTS" ]; then
+        # The GPU build could not be installed (network, proxy, an index that is down): the application must still install.
+        echo "WARNING: installing the GPU requirements failed; falling back to the CPU requirements from $BASE_REQUIREMENTS" >> "$LOG_FILE"
+        SELECTED_REQUIREMENTS="$BASE_REQUIREMENTS"
+        "$PYTHON_EXE" -m pip install -r "$SELECTED_REQUIREMENTS" >> "$LOG_FILE" 2>&1 || fail "Application requirements installation failed."
+    else
+        fail "Application requirements installation failed."
+    fi
+fi
+echo "Requirements installed from $SELECTED_REQUIREMENTS" >> "$LOG_FILE"
 
 if [[ "${OSTYPE:-}" == "darwin"* ]]; then
     echo "Detected macOS platform" >> "$LOG_FILE"
@@ -63,11 +73,35 @@ fi
 # External Python code is optional. Verify the generated package only when the
 # constructor bundled setup.py and src/.
 if [ -f "$PROJECT_ROOT/setup.py" ]; then
-    echo "Found setup.py, installing PROJECT_NAME package locally without build isolation" >> "$LOG_FILE"
+    echo "Found setup.py, installing LabConstrictorPlayground package locally without build isolation" >> "$LOG_FILE"
     "$PYTHON_EXE" -m pip install --no-deps --no-build-isolation "$PROJECT_ROOT" >> "$LOG_FILE" 2>&1
-    "$PYTHON_EXE" -c "import PYTHON_PROJ_NAME; print('PROJECT_NAME import successful:', PYTHON_PROJ_NAME.__file__)" >> "$LOG_FILE" 2>&1
+    "$PYTHON_EXE" -c "import labconstrictor_playground; print('LabConstrictorPlayground import successful:', labconstrictor_playground.__file__)" >> "$LOG_FILE" 2>&1
 else
     echo "No setup.py detected; this project does not bundle an optional Python package." >> "$LOG_FILE"
+fi
+
+
+# --- Optional: expose the app's tools to Napari, Fiji and the command line (LabConstrictor tools bridge) -------------------
+# If the app's package ships a module named <package>_lc_tools, install labconstrictor-tools and register that module.
+# This step must never fail the installation. LC_TOOLS_SPEC can point to another source (wheel, git URL, mirror).
+# Default source: the GitHub archive of labconstrictor-tools (a plain zip: no git needed on the user's computer), because the package
+# is not on PyPI yet. Once it is, use "labconstrictor-tools" here.
+LC_TOOLS_MODULE="labconstrictor_playground_lc_tools"
+if [ -f "$PROJECT_ROOT/setup.py" ] && "$PYTHON_EXE" -c "import importlib.util, sys; sys.exit(0 if importlib.util.find_spec('$LC_TOOLS_MODULE') else 1)" >> "$LOG_FILE" 2>&1; then
+    lc_note() { echo "$*" >> "$LOG_FILE" || :; }  # a full or unwritable log must not fail the installation
+    lc_note "Found $LC_TOOLS_MODULE: registering the tools of LabConstrictorPlayground for Napari and Fiji"
+    LC_APP_VERSION="$(sed -n 's/^version: *//p' "$PROJECT_ROOT/construct.yaml" 2>/dev/null | head -1 | tr -d "\"'\r" || true)"
+    if [ -z "$LC_APP_VERSION" ]; then
+        lc_note "WARNING: no version: line at the start of a line in construct.yaml - registering the tools with version 0."
+        LC_APP_VERSION=0
+    fi
+    if "$PYTHON_EXE" -m pip install "${LC_TOOLS_SPEC:-https://github.com/CellMigrationLab/LabConstrictor-Tools/archive/refs/heads/main.zip}" >> "$LOG_FILE" 2>&1 \
+        && "$PYTHON_EXE" -m labconstrictor_tools register --name "LabConstrictorPlayground" --prefix "$PREFIX" \
+            --module "$LC_TOOLS_MODULE" --version "$LC_APP_VERSION" --display-name "LabConstrictorPlayground" >> "$LOG_FILE" 2>&1; then
+        lc_note "Tools registered (labconstrictor-tools list shows them)."
+    else
+        lc_note "WARNING: tool registration failed - see the pip and register output above in this file; LabConstrictorPlayground itself is installed."
+    fi
 fi
 
 "$PYTHON_EXE" "$PROJECT_ROOT/include_path.py" --path "$PREFIX" --files "$PROJECT_ROOT/notebook_launcher.json" --keyword "BASE_PATH_KEYWORD" >> "$LOG_FILE" 2>&1
@@ -86,7 +120,7 @@ fi
 echo "Launcher preflight completed successfully." >> "$LOG_FILE"
 
 "$PYTHON_EXE" -c "import os, sys; print('Python:', sys.executable); print('Prefix:', os.environ.get('PREFIX'))" >> "$LOG_FILE" 2>&1
-"$PYTHON_EXE" -c "from menuinst.api import install; import os; print(install(os.path.join('$PREFIX', 'PROJECT_NAME', 'notebook_launcher.json')))" >> "$LOG_FILE" 2>&1
+"$PYTHON_EXE" -c "from menuinst.api import install; import os; print(install(os.path.join('$PREFIX', 'LabConstrictorPlayground', 'notebook_launcher.json')))" >> "$LOG_FILE" 2>&1
 
 echo "Post-install completed successfully." >> "$LOG_FILE"
 
