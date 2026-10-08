@@ -88,17 +88,11 @@ A diagnostic report can contain machine and installation details. **Review it be
 
 For more detail, see [Bridge testing with Playground](docs/TESTING_THE_BRIDGE.md).
 
-## Applications you can try
+## Other applications
 
-These are separate scientific applications, not tools bundled with this bridge. Install an application and its LabConstrictor tool registration before expecting it to appear in Fiji, Napari or QuPath.
+Playground is a test application, not a scientific analysis package. Once the bridge works with its example tools, you can install applications such as [Guess the Condition](https://github.com/CellMigrationLab/GuessTheCondition), [NucleiSky](https://github.com/CellMigrationLab/NucleiSky), [VLab4Mic](https://github.com/CellMigrationLab/LabConstrictor-VLab4Mic) or [CellTracksColab](https://github.com/CellMigrationLab/CellTracksColab_LabConstrictor).
 
-- [LabConstrictor Playground](https://github.com/CellMigrationLab/LabConstrictor-Playground) — synthetic images, segmentation outputs, installation checks and host integration tests. [Installers](https://github.com/CellMigrationLab/LabConstrictor-Playground/releases).
-- [NucleiSky](https://github.com/CellMigrationLab/NucleiSky) — registration of microscopy images using nuclei positions. [Desktop installation](https://github.com/CellMigrationLab/NucleiSky/blob/main/.tools/docs/download_executable.md). Its repository documents Fiji integration; verify the installed version exposes the required tools.
-- [VLab4Mic desktop application](https://github.com/CellMigrationLab/LabConstrictor-VLab4Mic) — fluorescence microscopy simulations and image comparison. [Installation guide](https://github.com/CellMigrationLab/LabConstrictor-VLab4Mic/blob/main/.tools/docs/download_executable.md). Its repository documents Napari and Fiji bridge workflows.
-- [CellTracksColab desktop application](https://github.com/CellMigrationLab/CellTracksColab_LabConstrictor) — cell-track analysis. [Desktop installation](https://github.com/CellMigrationLab/CellTracksColab_LabConstrictor/blob/main/.tools/docs/download_executable.md). Check the installed application's declared tools before assuming a particular host workflow is available.
-- [Guess the Condition](https://github.com/CellMigrationLab/GuessTheCondition) — blinded classification of microscopy images to test whether experimental conditions can be distinguished across biological repeats. [Desktop installers](https://github.com/CellMigrationLab/GuessTheCondition/releases) and [Colab notebook](https://colab.research.google.com/github/CellMigrationLab/GuessTheCondition/blob/main/notebooks/GuessTheCondition/GuessTheCondition.ipynb). Its repository documents five bridge tools for Napari and Fiji.
-
-**Compatibility is tool- and host-specific.** An application having a desktop installer does not by itself establish that every analysis function is exposed through the bridge. Use `labconstrictor-tools list` to inspect the installed tools.
+See the [Toolkit application list](https://github.com/CellMigrationLab/LabConstrictor-Tools#applications) for installer links and reported host workflows. A successful Playground check does not validate those applications.
 
 ## For developers
 
