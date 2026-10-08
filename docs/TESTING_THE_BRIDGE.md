@@ -4,7 +4,7 @@ Playground provides small, reproducible tools for checking whether LabConstricto
 
 ## Scientific applications
 
-For applications you can install, see [Playground](https://github.com/CellMigrationLab/LabConstrictor-Playground), [NucleiSky](https://github.com/CellMigrationLab/NucleiSky), [VLab4Mic desktop](https://github.com/CellMigrationLab/LabConstrictor-VLab4Mic) and [CellTracksColab desktop](https://github.com/CellMigrationLab/CellTracksColab_LabConstrictor) and [Guess the Condition](https://github.com/CellMigrationLab/GuessTheCondition). The corresponding README links to installation instructions and explains which host workflows have been documented. Only tools registered by the installed application appear in the bridge.
+For scientific applications to use after testing the bridge, see the [Toolkit application list](https://github.com/CellMigrationLab/LabConstrictor-Tools#applications), which includes [Guess the Condition](https://github.com/CellMigrationLab/GuessTheCondition). A passing Playground test does not validate another application.
 
 ## First: run Feature tour
 
