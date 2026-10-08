@@ -86,6 +86,8 @@ Start with **Check everything**, then try **Feature tour** in the host where you
 
 A diagnostic report can contain machine and installation details. **Review it before sharing publicly**, especially paths, usernames or environment information.
 
+For more detail, see [Bridge testing with Playground](docs/TESTING_THE_BRIDGE.md).
+
 ## For developers
 
 The scientific/test functions live in `src/labconstrictor_playground/`; the declarations exported to hosts live in `src/labconstrictor_playground_lc_tools/`. They use the same typed API as any other LabConstrictor application.
