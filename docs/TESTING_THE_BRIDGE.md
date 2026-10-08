@@ -4,7 +4,7 @@ Playground provides small, reproducible tools for checking whether LabConstricto
 
 ## Scientific applications
 
-For scientific applications to use after testing the bridge, see the [Toolkit application list](https://github.com/CellMigrationLab/LabConstrictor-Tools), which includes [Guess the Condition](https://github.com/CellMigrationLab/GuessTheCondition). A passing Playground test does not validate another application.
+Playground exercises the same manifest-driven connection used by any registered LabConstrictor application. A tool does not need a separate integration for each host, although its usefulness and presentation differ. See the [Toolkit](https://github.com/CellMigrationLab/LabConstrictor-Tools) for scientific applications.
 
 ## First: run Feature tour
 
