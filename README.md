@@ -88,6 +88,17 @@ A diagnostic report can contain machine and installation details. **Review it be
 
 For more detail, see [Bridge testing with Playground](docs/TESTING_THE_BRIDGE.md).
 
+## Applications you can try
+
+These are separate scientific applications, not tools bundled with this bridge. Install an application and its LabConstrictor tool registration before expecting it to appear in Fiji, Napari or QuPath.
+
+- [LabConstrictor Playground](https://github.com/CellMigrationLab/LabConstrictor-Playground) — synthetic images, segmentation outputs, installation checks and host integration tests. [Installers](https://github.com/CellMigrationLab/LabConstrictor-Playground/releases).
+- [NucleiSky](https://github.com/CellMigrationLab/NucleiSky) — registration of microscopy images using nuclei positions. [Desktop installation](https://github.com/CellMigrationLab/NucleiSky/blob/main/.tools/docs/download_executable.md). Its repository documents Fiji integration; verify the installed version exposes the required tools.
+- [VLab4Mic desktop application](https://github.com/CellMigrationLab/LabConstrictor-VLab4Mic) — fluorescence microscopy simulations and image comparison. [Installation guide](https://github.com/CellMigrationLab/LabConstrictor-VLab4Mic/blob/main/.tools/docs/download_executable.md). Its repository documents Napari and Fiji bridge workflows.
+- [CellTracksColab desktop application](https://github.com/CellMigrationLab/CellTracksColab_LabConstrictor) — cell-track analysis. [Desktop installation](https://github.com/CellMigrationLab/CellTracksColab_LabConstrictor/blob/main/.tools/docs/download_executable.md). Check the installed application's declared tools before assuming a particular host workflow is available.
+
+**Compatibility is tool- and host-specific.** An application having a desktop installer does not by itself establish that every analysis function is exposed through the bridge. Use `labconstrictor-tools list` to inspect the installed tools.
+
 ## For developers
 
 The scientific/test functions live in `src/labconstrictor_playground/`; the declarations exported to hosts live in `src/labconstrictor_playground_lc_tools/`. They use the same typed API as any other LabConstrictor application.
