@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=https://labconstrictor.cellmig.org/schema/labconstrictor-app.schema.json
+schema: 1
+name: LabConstrictor Playground
+summary: Check that a computer, an installation and its GPU are in order, and that every LabConstrictor feature works.
+description: |-
+  Press "Check everything" to get a readout of your machine, GPU, PyTorch, a short benchmark and the internet connection, plus a report you can attach to an issue. Developers use its tools as a fixed set of cases for the Napari, Fiji and QuPath bridge.
+kind: utility
+hosts: [notebook, napari, fiji, qupath]
+distribution:
+  installer: true
+license: MIT
+categories: [diagnostics, testing]
