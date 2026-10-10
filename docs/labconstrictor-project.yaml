@@ -1,0 +1,5 @@
+# yaml-language-server: $schema=https://labconstrictor.cellmig.org/schema/labconstrictor-project.schema.json
+# How this project is listed on the LabConstrictor website's Ecosystem page. Keep the status true.
+name: LabConstrictor Playground
+summary: Check that a computer, an installation and its GPU are in order, and that every LabConstrictor feature works.
+status: Available
