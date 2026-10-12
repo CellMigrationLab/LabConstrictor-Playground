@@ -46,7 +46,7 @@ def test_the_declarations_stay_light_and_are_valid():
     done = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, env=_child_env())
     assert done.returncode == 0, done.stderr
     assert done.stdout.split() == sorted(
-        ["check_everything", "feature_tour", "list_devices", "make_test_data", "run_on_device", "stress_big_image", "stress_crash", "stress_hang", "stress_many_points", "stress_out_of_memory", "stress_slow"]
+        ["check_everything", "feature_tour", "list_devices", "make_test_data", "run_on_device", "stress_big_image", "stress_crash", "stress_hang", "stress_many_points", "stress_out_of_memory", "stress_real_memory", "stress_slow"]
     )
 
 
@@ -109,8 +109,6 @@ def test_stress_functions():
     assert abs(stress.big_image(2).nbytes - 2 * 1024 * 1024) < 4096
     frame = stress.many_points(1000)
     assert list(frame.columns) == ["y", "x", "score"] and len(frame) == 1000
-    with pytest.raises(MemoryError):
-        stress.out_of_memory()
     seen = []
     assert stress.slow(0.6, lambda f, m: seen.append(f), lambda: None) >= 0.6 and seen
 
@@ -124,3 +122,53 @@ def test_slow_stops_when_cancel_raises():
 
     with pytest.raises(Stop):
         stress.slow(5, lambda f, m: None, cancelled)
+
+
+def test_simulated_out_of_memory_is_deterministic_labelled_and_allocates_nothing(monkeypatch):
+    import tracemalloc
+
+    monkeypatch.setattr(np, "empty", lambda *a, **k: pytest.fail("the simulated case must not allocate through numpy"))
+    tracemalloc.start()
+    try:
+        for _ in range(2):  # the same every time
+            with pytest.raises(MemoryError, match="SIMULATED") as caught:
+                stress.out_of_memory()
+            assert str(caught.value) == stress.SIMULATED_MEMORY_MESSAGE
+        assert tracemalloc.get_traced_memory()[1] < 1024 * 1024
+    finally:
+        tracemalloc.stop()
+
+
+def test_the_declared_simulated_tool_reports_a_memory_error():
+    import labconstrictor_playground_lc_tools as tools
+
+    run = getattr(tools.stress_out_of_memory, "__wrapped__", tools.stress_out_of_memory)
+    with pytest.raises(MemoryError, match="SIMULATED"):
+        run()
+
+
+def test_the_real_memory_test_is_bounded_before_anything_runs():
+    assert stress.real_memory_limit(10**9) == stress.REAL_MEMORY_MAX_MB <= 512
+    assert stress.real_memory_limit(-5) == 8
+
+
+def test_real_memory_pressure_uses_a_bounded_child_process(monkeypatch):
+    seen = {}
+
+    def fake_run(cmd, **kwargs):
+        seen["cmd"], seen["timeout"] = cmd, kwargs["timeout"]
+        return subprocess.CompletedProcess(cmd, 0, stdout="memory_error 16 address space limited\n", stderr="")
+
+    monkeypatch.setattr(stress.subprocess, "run", fake_run)
+    result = stress.real_memory_pressure(10**9, 10**9, timeout=5)
+    assert result == {"outcome": "memory_error", "allocated_mb": 16, "detail": "address space limited"}
+    assert seen["cmd"][0] == sys.executable and seen["cmd"][-3:-1] == [str(stress.REAL_MEMORY_MAX_MB)] * 2 and seen["timeout"] == 5
+    monkeypatch.setattr(stress.subprocess, "run", lambda cmd, **k: subprocess.CompletedProcess(cmd, -9, stdout="", stderr="Killed"))
+    assert stress.real_memory_pressure()["outcome"].startswith("child_ended_abruptly")
+
+
+@pytest.mark.skipif(os.environ.get("PLAYGROUND_REAL_MEMORY_TEST") != "1", reason="opt-in: set PLAYGROUND_REAL_MEMORY_TEST=1 (really uses up to 64 MB in a child process)")
+def test_real_memory_pressure_for_real_opt_in():
+    result = stress.real_memory_pressure(target_mb=64, limit_mb=32, timeout=60)
+    assert result["outcome"] in {"memory_error", "completed"}, result
+    assert 0 <= result["allocated_mb"] <= 64

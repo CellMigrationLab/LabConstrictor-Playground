@@ -13,7 +13,7 @@
 ## What it is for
 
 - **Testers** install it like any LabConstrictor app and press **Check everything**. They get a short readout (a tick, a warning or a cross per layer, with *what to do* beside each cross) and a `report.json` to attach to an issue. This is how we learn what works on Windows and macOS, with or without a GPU.
-- **Developers** use its tools as a fixed set of cases for the tools bridge: a dropdown that follows another tool, replace, messages, points, channels, large results, cancel, a crash, no memory, a tool that ignores Cancel.
+- **Developers** use its tools as a fixed set of cases for the tools bridge: a dropdown that follows another tool, replace, messages, points, channels, large results, cancel, a crash, no memory (simulated), a tool that ignores Cancel.
 - **App authors** get the same checks for their own app in three lines (`labconstrictor_tools.diagnostics`, see the Tools repository).
 
 ## The tools (Napari, Fiji, QuPath, command line)
@@ -25,7 +25,7 @@
 | **Run a small test on a device** | The same test on the device chosen in a dropdown (shows the dependent dropdown and real GPU use). |
 | **Make test data** | Small files made from a seed: a 3-channel image whose channels have the means 10, 20 and 30 (a tool that receives the wrong channel is caught), an RGB image, labels, a time-lapse, a table of points. |
 | **Feature tour** | One small segmentation that uses every control and output of the bridge: a channel picker, "use the selection" as a region, radio buttons and sliders, a folded group with a box that empties itself, and labels, outlines, points, a table and a message as results (each run replaces the last). Run it with no image to use a built-in demo image (round blobs, rings with a hole, blobs in two parts). |
-| **Stress: ...** | A big image, many points (up to 2 million), a slow run with progress, a crash, no memory, a tool that ignores Cancel. The host must survive each of them and say what happened. |
+| **Stress: ...** | A big image, many points (up to 2 million), a slow run with progress, a crash, no memory, a tool that ignores Cancel. The host must survive each of them and say what happened. *Out of memory (simulated)* raises a labelled `MemoryError` without using any memory, the same on every system; *Real memory pressure (bounded, opt-in)* is a separate tool in which a child process really uses at most 512 MB. |
 
 ## Install
 

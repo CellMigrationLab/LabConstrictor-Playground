@@ -6,6 +6,8 @@ Declarations: `src/labconstrictor_playground_lc_tools/`. The tools run in the ap
     labconstrictor-tools check --module labconstrictor_playground_lc_tools --pythonpath src
     labconstrictor-tools test  --module labconstrictor_playground_lc_tools --pythonpath src --cases lc_tests/cases.json
 
-The cases run every tool once with a normal input, plus the cases that must fail clearly (a device that is not there, no memory) or end the worker (a crash). The speed test of `check_everything` needs PyTorch in the environment.
+The cases run every tool once with a normal input, plus the cases that must fail clearly (a device that is not there, a SIMULATED out of memory that raises a labelled `MemoryError` and allocates nothing) or end the worker (a crash). The speed test of `check_everything` needs PyTorch in the environment.
 
 `stress_hang` has no case here: the case runner has no grace-period kill (the hosts do). It is exercised by the host test suites: after Cancel the host must stop the worker within its grace period and leave no process behind.
+
+`stress_real_memory` (real but bounded memory use, at most 512 MB, in a child process) has no case here on purpose: it is opt-in. Run it by hand from a host, or run its unit test with `PLAYGROUND_REAL_MEMORY_TEST=1 pytest tests/test_playground.py -k real_memory`.
