@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import sys
 import time
+import uuid
 from pathlib import Path
 
 from labconstrictor_tools import diagnostics
@@ -63,10 +64,23 @@ def benchmark_figure(checks: list[Check], path: Path) -> Path | None:
     return path
 
 
+def new_report_folder(parent: str | Path) -> Path:
+    """Create and return a folder that did not exist before: `check_<date>_<time>_<random>` (the stamp is for people, the random suffix keeps
+    two runs in the same second, or on two machines sharing the folder, apart). `mkdir` without `exist_ok` is the atomic claim, so an existing folder is never reused."""
+    parent = Path(parent)
+    parent.mkdir(parents=True, exist_ok=True)
+    while True:
+        folder = parent / ("%s_%s" % (time.strftime("check_%Y%m%d_%H%M%S"), uuid.uuid4().hex[:8]))
+        try:
+            folder.mkdir()
+        except FileExistsError:
+            continue
+        return folder
+
+
 def write_report(checks: list[Check], folder: str | Path) -> dict[str, Path]:
-    """report.json (attach it to an issue), summary.txt and, when there is a benchmark, benchmark.png, in a time-stamped folder."""
-    folder = Path(folder) / time.strftime("check_%Y%m%d_%H%M%S")
-    folder.mkdir(parents=True, exist_ok=True)
+    """report.json (attach it to an issue), summary.txt and, when there is a benchmark, benchmark.png, in a new folder of its own (never reused)."""
+    folder = new_report_folder(folder)
     files = {"json": folder / "report.json", "summary": folder / "summary.txt"}
     files["json"].write_text(diagnostics.as_json(checks), encoding="utf-8")
     files["summary"].write_text(diagnostics.summary(checks), encoding="utf-8")

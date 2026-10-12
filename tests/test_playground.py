@@ -17,6 +17,23 @@ import numpy as np  # noqa: E402
 from labconstrictor_playground import checks, data, stress  # noqa: E402
 
 
+def _child_env():
+    """The current environment (PATH, SystemRoot, ...) with the local `src` first on PYTHONPATH, joined with the platform separator."""
+    env = os.environ.copy()
+    env["PYTHONPATH"] = os.pathsep.join([str(ROOT / "src")] + ([env["PYTHONPATH"]] if env.get("PYTHONPATH") else []))
+    return env
+
+
+def test_child_environment_keeps_the_parent_environment_and_puts_src_first(monkeypatch):
+    monkeypatch.setenv("PYTHONPATH", os.pathsep.join(["elsewhere", "other"]))
+    monkeypatch.setenv("PLAYGROUND_MARKER", "kept")
+    env = _child_env()
+    assert env["PYTHONPATH"].split(os.pathsep) == [str(ROOT / "src"), "elsewhere", "other"]
+    assert env["PLAYGROUND_MARKER"] == "kept" and env.get("PATH") == os.environ.get("PATH")
+    monkeypatch.delenv("PYTHONPATH")
+    assert _child_env()["PYTHONPATH"] == str(ROOT / "src")
+
+
 def test_the_declarations_stay_light_and_are_valid():
     code = (
         "import sys, labconstrictor_playground_lc_tools\n"
@@ -26,7 +43,7 @@ def test_the_declarations_stay_light_and_are_valid():
         "ids = sorted(t['id'] for t in describe_tools('labconstrictor_playground_lc_tools')['tools'])\n"
         "print(' '.join(ids))\n"
     )
-    done = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, env={"PYTHONPATH": str(ROOT / "src") + ":" + ":".join(sys.path)})
+    done = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, env=_child_env())
     assert done.returncode == 0, done.stderr
     assert done.stdout.split() == sorted(
         ["check_everything", "feature_tour", "list_devices", "make_test_data", "run_on_device", "stress_big_image", "stress_crash", "stress_hang", "stress_many_points", "stress_out_of_memory", "stress_real_memory", "stress_slow"]
@@ -136,6 +153,43 @@ def test_cuda_is_synchronized_at_both_boundaries_and_the_cpu_is_not():
     timing.time_device(_FakeTorch(events), "cpu", lambda: None, 1)
     assert events == []
 
+
+def test_two_reports_in_the_same_second_are_both_kept(tmp_path, monkeypatch):
+    from labconstrictor_tools.diagnostics import Check
+
+    monkeypatch.setattr(checks.time, "strftime", lambda fmt: "check_20260101_120000")  # a frozen clock
+    drawn = []
+
+    def figure(found, path):
+        if not any(c.layer == "benchmark" for c in found):
+            return None
+        path.write_bytes(b"png")
+        drawn.append(path)
+        return path
+
+    monkeypatch.setattr(checks, "benchmark_figure", figure)
+    first = [Check("machine", "RAM", "ok", "first run"), Check("benchmark", "cpu", "info", "1.0 ms")]
+    second = [Check("machine", "RAM", "warn", "second run")]
+    one = checks.write_report(first, tmp_path)
+    two = checks.write_report(second, tmp_path)
+    assert one["json"].parent != two["json"].parent
+    assert len([p for p in tmp_path.iterdir() if p.is_dir()]) == 2
+    assert all(p.parent.name.startswith("check_20260101_120000") for p in (one["json"], two["json"]))
+    assert json.loads(one["json"].read_text(encoding="utf-8"))["checks"][0]["detail"] == "first run"
+    assert json.loads(two["json"].read_text(encoding="utf-8"))["checks"][0]["detail"] == "second run"
+    assert "figure" in one and drawn == [one["figure"]]
+    assert "figure" not in two and not (two["json"].parent / "benchmark.png").exists()
+
+
+def test_a_taken_report_folder_is_never_reused(tmp_path, monkeypatch):
+    monkeypatch.setattr(checks.time, "strftime", lambda fmt: "check_20260101_120000")
+    suffixes = iter(["aaaaaaaa", "aaaaaaaa", "bbbbbbbb"])
+    monkeypatch.setattr(checks.uuid, "uuid4", lambda: type("U", (), {"hex": next(suffixes) + "0" * 24})())
+    first = checks.new_report_folder(tmp_path)
+    (first / "report.json").write_text("keep me", encoding="utf-8")
+    second = checks.new_report_folder(tmp_path)  # the same suffix is drawn once more: it must retry
+    assert first.name.endswith("aaaaaaaa") and second.name.endswith("bbbbbbbb")
+    assert (first / "report.json").read_text(encoding="utf-8") == "keep me" and not list(second.iterdir())
 
 
 def test_simulated_out_of_memory_is_deterministic_labelled_and_allocates_nothing(monkeypatch):
