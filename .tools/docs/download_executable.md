@@ -106,16 +106,10 @@ First of all, you will need to choose whether you want to install it with **(A) 
 > **How to know which one should I download?**
 > 1. Click the Apple menu in the top-left corner of your screen.
 > 2. Select About This Mac.
-> 3. A window will pop up displaying your Mac’s information. Look into the `Chip` or `Processor` field. If `Intel` is mentioned, then download the Intel option. Otherwise, if `Mx` (e.g. M1 or M2) is mentioned, then download the ARM64 option. 
+> 3. A window will pop up displaying your Mac’s information. Look into the `Chip` or `Processor` field. Only Macs with an Apple silicon chip (`Mx`, e.g. M1 or M2) are supported; if it says `Intel`, this application is not available for your Mac.
 
 <a href="https://github.com/GITHUB_OWNER/GITHUB_REPO_NAME/releases/download/0.0.1/PROJECT_NAME-0.0.1-MacOSX-arm64.pkg">
     <img src="https://img.shields.io/badge/Download%20for%20Mac%20(ARM64)-Latest-lightgrey?logo=apple&style=for-the-badge" alt="Download for Mac ARM64" width="250">
-</a>
-
-or 
-    
-<a href="https://github.com/GITHUB_OWNER/GITHUB_REPO_NAME/releases/download/0.0.1/PROJECT_NAME-0.0.1-MacOSX-x86_64.pkg">
-    <img src="https://img.shields.io/badge/Download%20for%20Mac%20(Intel)-Latest-lightgrey?logo=apple&style=for-the-badge" alt="Download for Mac Intel" width="250">
 </a>
 
 
@@ -147,16 +141,10 @@ After installation, you can launch PROJECT_NAME from your Applications folder an
 > **How to know which one should I download?**
 > 1. Click the Apple menu in the top-left corner of your screen.
 > 2. Select About This Mac.
-> 3. A window will pop up displaying your Mac’s information. Look into the `Chip` or `Processor` field. If `Intel` is mentioned, then download the Intel option. Otherwise, if `Mx` (e.g. M1 or M2) is mentioned, then download the ARM64 option. 
+> 3. A window will pop up displaying your Mac’s information. Look into the `Chip` or `Processor` field. Only Macs with an Apple silicon chip (`Mx`, e.g. M1 or M2) are supported; if it says `Intel`, this application is not available for your Mac.
 
 <a href="https://github.com/GITHUB_OWNER/GITHUB_REPO_NAME/releases/download/0.0.1/PROJECT_NAME-0.0.1-MacOSX-arm64.sh">
     <img src="https://img.shields.io/badge/Download%20for%20Mac%20(ARM64)-Latest-lightgrey?logo=apple&style=for-the-badge" alt="Download for Mac ARM64" width="250">
-</a>
-
-or 
-    
-<a href="https://github.com/GITHUB_OWNER/GITHUB_REPO_NAME/releases/download/0.0.1/PROJECT_NAME-0.0.1-MacOSX-x86_64.sh">
-    <img src="https://img.shields.io/badge/Download%20for%20Mac%20(Intel)-Latest-lightgrey?logo=apple&style=for-the-badge" alt="Download for Mac Intel" width="250">
 </a>
 
 

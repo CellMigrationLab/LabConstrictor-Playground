@@ -41,6 +41,10 @@ def slow(seconds: float, step, cancelled) -> float:
 def crash() -> None:
     """Kill the process the way a native library does: a real segmentation fault (an access violation on Windows), not an exception and not a
     chosen exit code (hosts read the exit code to say what happened, so a made-up one would be misleading)."""
+    import faulthandler
+
+    if hasattr(faulthandler, "_sigsegv"):  # a real fault on every platform; ctypes.string_at(0) only raises OSError on Windows
+        faulthandler._sigsegv()
     import ctypes
 
     ctypes.string_at(0)
