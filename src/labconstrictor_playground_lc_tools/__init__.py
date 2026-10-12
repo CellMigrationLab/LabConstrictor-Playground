@@ -95,8 +95,6 @@ def run_on_device(
         import torch
     except ImportError as error:
         raise ToolError("no_pytorch", "PyTorch is not installed in this application, so there is only the CPU test of 'Check everything'.") from error
-    import time
-
     generator = torch.Generator().manual_seed(0)
     image = torch.rand(1, 1, size, size, generator=generator).to(device)
     kernel = torch.rand(8, 1, 5, 5, generator=generator).to(device)
@@ -105,15 +103,13 @@ def run_on_device(
     def work():
         return torch.nn.functional.conv2d(image, kernel, padding=2).sum() + (matrix @ matrix).sum()
 
-    work()
-    started = time.perf_counter()
-    for index in range(repeats):
+    from labconstrictor_playground.timing import time_device
+
+    def each(index):
         check_cancel()
         progress((index + 1) / repeats, "run %d of %d on %s" % (index + 1, repeats, device))
-        value = work()
-    if device.startswith("cuda"):
-        torch.cuda.synchronize()
-    seconds = (time.perf_counter() - started) / repeats
+
+    seconds, value = time_device(torch, device, work, repeats, each)
     return "**%s**: %.1f ms per run (%dx%d)" % (device, seconds * 1000, size, size), {"device": device, "ms_per_run": round(seconds * 1000, 2), "result": round(float(value.cpu()), 3)}
 
 

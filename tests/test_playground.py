@@ -106,3 +106,34 @@ def test_slow_stops_when_cancel_raises():
 
     with pytest.raises(Stop):
         stress.slow(5, lambda f, m: None, cancelled)
+
+
+class _FakeTorch:
+    """Records every synchronize call and every unit of work, in order, so the order around the timer can be asserted."""
+
+    def __init__(self, events):
+        self.cuda = type("cuda", (), {"synchronize": staticmethod(lambda: events.append("sync:cuda"))})
+        self.mps = type("mps", (), {"synchronize": staticmethod(lambda: events.append("sync:mps"))})
+
+
+def test_mps_is_synchronized_after_warm_up_and_before_stopping_the_clock(monkeypatch):
+    from labconstrictor_playground import timing
+
+    events = []
+    clock = iter([100.0, 102.0])
+    monkeypatch.setattr(timing.time, "perf_counter", lambda: events.append("clock") or next(clock))
+    seconds, value = timing.time_device(_FakeTorch(events), "mps", lambda: events.append("work") or "v", 2)
+    assert events == ["work", "sync:mps", "clock", "work", "work", "sync:mps", "clock"]
+    assert seconds == 1.0 and value == "v"
+
+
+def test_cuda_is_synchronized_at_both_boundaries_and_the_cpu_is_not():
+    from labconstrictor_playground import timing
+
+    events = []
+    timing.time_device(_FakeTorch(events), "cuda:0", lambda: None, 1)
+    assert events == ["sync:cuda", "sync:cuda"]
+    events.clear()
+    timing.time_device(_FakeTorch(events), "cpu", lambda: None, 1)
+    assert events == []
+
