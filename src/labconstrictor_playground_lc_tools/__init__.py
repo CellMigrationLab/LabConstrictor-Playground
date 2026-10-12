@@ -219,14 +219,26 @@ def stress_crash() -> Scalars:
     return {}
 
 
-@tool("Stress: out of memory")
+@tool("Stress: out of memory (simulated)")
 def stress_out_of_memory() -> Scalars:
-    """Asks for far more memory than exists: the host must show a clear failure, and the worker must stay usable."""
+    """SIMULATED: raises a MemoryError on purpose without using any memory (the same on every system): the host must show a clear failure, and the worker must stay usable."""
     from labconstrictor_playground import stress
 
-    progress(0.5, "asking for 10 TB on purpose")
+    progress(0.5, "raising a simulated MemoryError (no memory is used)")
     stress.out_of_memory()
     return {}
+
+
+@tool("Stress: real memory pressure (bounded, opt-in)")
+def stress_real_memory(
+    target_mb: Annotated[int, Min(8), Max(512), Description("Memory the test process tries to use; never more than 512 MB")] = 128,
+    limit_mb: Annotated[int, Min(8), Max(512), Advanced(), Description("On Linux the test process may not grow beyond this (so a larger target ends in a real MemoryError of that process)")] = 64,
+) -> Scalars:
+    """REAL but bounded: a separate test process really uses memory (at most 512 MB). Run it on purpose; the worker is never the process that is limited."""
+    from labconstrictor_playground import stress
+
+    progress(0.3, "a separate process is using up to %d MB of real memory" % target_mb)
+    return stress.real_memory_pressure(target_mb, limit_mb)
 
 
 @tool("Stress: a tool that ignores Cancel")
