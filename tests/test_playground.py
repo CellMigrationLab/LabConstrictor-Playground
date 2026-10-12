@@ -1,6 +1,7 @@
 """The playground package and its tools: checks, test data, stress functions, and the light import of the declarations."""
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -16,6 +17,23 @@ import numpy as np  # noqa: E402
 from labconstrictor_playground import checks, data, stress  # noqa: E402
 
 
+def _child_env():
+    """The current environment (PATH, SystemRoot, ...) with the local `src` first on PYTHONPATH, joined with the platform separator."""
+    env = os.environ.copy()
+    env["PYTHONPATH"] = os.pathsep.join([str(ROOT / "src")] + ([env["PYTHONPATH"]] if env.get("PYTHONPATH") else []))
+    return env
+
+
+def test_child_environment_keeps_the_parent_environment_and_puts_src_first(monkeypatch):
+    monkeypatch.setenv("PYTHONPATH", os.pathsep.join(["elsewhere", "other"]))
+    monkeypatch.setenv("PLAYGROUND_MARKER", "kept")
+    env = _child_env()
+    assert env["PYTHONPATH"].split(os.pathsep) == [str(ROOT / "src"), "elsewhere", "other"]
+    assert env["PLAYGROUND_MARKER"] == "kept" and env.get("PATH") == os.environ.get("PATH")
+    monkeypatch.delenv("PYTHONPATH")
+    assert _child_env()["PYTHONPATH"] == str(ROOT / "src")
+
+
 def test_the_declarations_stay_light_and_are_valid():
     code = (
         "import sys, labconstrictor_playground_lc_tools\n"
@@ -25,7 +43,7 @@ def test_the_declarations_stay_light_and_are_valid():
         "ids = sorted(t['id'] for t in describe_tools('labconstrictor_playground_lc_tools')['tools'])\n"
         "print(' '.join(ids))\n"
     )
-    done = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, env={"PYTHONPATH": str(ROOT / "src") + ":" + ":".join(sys.path)})
+    done = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, env=_child_env())
     assert done.returncode == 0, done.stderr
     assert done.stdout.split() == sorted(
         ["check_everything", "feature_tour", "list_devices", "make_test_data", "run_on_device", "stress_big_image", "stress_crash", "stress_hang", "stress_many_points", "stress_out_of_memory", "stress_slow"]
