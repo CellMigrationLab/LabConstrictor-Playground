@@ -49,6 +49,6 @@ Honest limits: OpenCL on macOS is deprecated by Apple and ROCm (AMD) works on Li
 
 ## Developers
 
-`src/labconstrictor_playground` holds the code (`checks.py`, `data.py`, `stress.py`), `src/labconstrictor_playground_lc_tools` the tool declarations, `lc_tests/` the tool cases (see its README), `tests/test_playground.py` the unit tests. The checks themselves are in [labconstrictor-tools](https://github.com/CellMigrationLab/LabConstrictor-Tools) (`labconstrictor_tools.diagnostics`), so every app can reuse them.
+`src/labconstrictor_playground` holds the code (`checks.py`, `data.py`, `stress.py`, `timing.py`), `src/labconstrictor_playground_lc_tools` the tool declarations, `lc_tests/` the tool cases (see its README), `tests/test_playground.py` the unit tests. The checks themselves are in [labconstrictor-tools](https://github.com/CellMigrationLab/LabConstrictor-Tools) (`labconstrictor_tools.diagnostics`), so every app can reuse them.
 
 Built from the [LabConstrictor](https://github.com/CellMigrationLab/LabConstrictor) template (see `.tools/docs`).
