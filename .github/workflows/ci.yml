@@ -37,6 +37,8 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pytest "git+https://github.com/CellMigrationLab/LabConstrictor-Tools@main"
           python -m pip install -e .
+          # PyTorch for the device tests of lc_tests/cases.json (the CPU build; macOS and Windows wheels are CPU builds already)
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple
 
       - name: Run the tests
         run: python -m pytest tests -v
