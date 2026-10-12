@@ -25,6 +25,11 @@
 | **Run a small test on a device** | The same test on the device chosen in a dropdown (shows the dependent dropdown and real GPU use). |
 | **Make test data** | Small files made from a seed: a 3-channel image whose channels have the means 10, 20 and 30 (a tool that receives the wrong channel is caught), an RGB image, labels, a time-lapse, a table of points. |
 | **Feature tour** | One small segmentation that uses every control and output of the bridge: a channel picker, "use the selection" as a region, radio buttons and sliders, a folded group with a box that empties itself, and labels, outlines, points, a table and a message as results (each run replaces the last). Run it with no image to use a built-in demo image (round blobs, rings with a hole, blobs in two parts). |
+| **Look inside a file** | A small text or JSON file (at most 1 MB) as the single-file input: the keys and plain values of a JSON file, or the number of lines of any other text. |
+| **Summarise a table** | A CSV table as input: the count, mean, minimum and maximum of each numeric column, as a table plus the number of rows and columns. |
+| **Count the pixels above a level** | A parameter that another one switches on: the pixel `level` is only meaningful in mode *fixed*, the `percentile` only in mode *percentile*; Napari greys the other out (Fiji shows both, and the tool accepts both). |
+| **Area of the bright region** | An image with a linked pixel size: the host fills it from the image's calibration. There is no default stand-in: an unknown pixel size stops the run with a clear message instead of giving an area made with a guessed one. |
+| **Align the centres of two images** | Returns a 3x3 transform (the translation that moves the intensity centre of one image onto that of the other) attached to the two images; a host shows the moved image on the reference. |
 | **Stress: ...** | A big image, many points (up to 2 million), a slow run with progress, a crash, no memory, a tool that ignores Cancel. The host must survive each of them and say what happened. *Out of memory (simulated)* raises a labelled `MemoryError` without using any memory, the same on every system; *Real memory pressure (bounded, opt-in)* is a separate tool in which a child process really uses at most 512 MB. |
 
 ## Install

@@ -12,12 +12,15 @@ from typing import Annotated, Literal, Optional
 
 from labconstrictor_tools import (
     Advanced,
+    Affine,
     ApplyTo,
     Axes,
     ChoicesFrom,
     ClearAfterRun,
     Collapsed,
     Description,
+    EnabledWhen,
+    File,
     FileOut,
     Folder,
     Group,
@@ -31,11 +34,13 @@ from labconstrictor_tools import (
     Min,
     Name,
     PickChannel,
+    PixelSizeOf,
     PointsOut,
     RegionOf,
     Replace,
     Scalars,
     ShapesOut,
+    Table,
     TableOut,
     ToolError,
     Unit,
@@ -174,6 +179,104 @@ def feature_tour(
     if side_note:
         text += "\n\n> " + side_note.replace("\n", " ")
     return labels, labels_to_shapes(labels), table[["y", "x", "label", "area_px"]], table, text
+
+
+# ------------------------------------------------------------------------------------------------ more of the bridge: a file, a table, a dependent parameter, a pixel size, a matrix
+MAX_FILE_BYTES = 1_000_000
+
+
+@tool("Look inside a file")
+def look_inside_file(
+    file: Annotated[File, Group("File"), Description("A small text or JSON file (at most 1 MB)")],
+) -> Scalars:
+    """Reads one small file and says what is in it: a JSON file gives its keys and its plain values, any other text its number of lines."""
+    import json
+
+    size = file.stat().st_size
+    if size > MAX_FILE_BYTES:
+        raise ToolError("file_too_large", "'%s' is %d bytes; this tool reads files of at most %d bytes." % (file.name, size, MAX_FILE_BYTES))
+    try:
+        text = file.read_text(encoding="utf-8")
+    except UnicodeDecodeError as error:
+        raise ToolError("not_text", "'%s' is not a UTF-8 text file." % file.name) from error
+    result: dict = {"file": file.name, "bytes": size}
+    try:
+        content = json.loads(text)
+    except ValueError:
+        result.update({"kind": "text", "lines": len(text.splitlines())})
+        return result
+    result["kind"] = "json"
+    if isinstance(content, dict):
+        result["keys"] = ", ".join(sorted(content))
+        result.update({"value_" + key: value for key, value in content.items() if isinstance(value, (str, int, float, bool))})
+    return result
+
+
+@tool("Summarise a table")
+def summarise_table(
+    table: Annotated[Table, Group("Table"), Description("A CSV table; every column of numbers is summarised")],
+) -> tuple[Annotated[TableOut, Name("summary"), Replace()], Scalars]:
+    """The count, mean, minimum and maximum of each numeric column of a CSV table, and how many rows and columns it has."""
+    numeric = table.select_dtypes("number")
+    if numeric.shape[1] == 0:
+        raise ToolError("no_numbers", "The table has no column of numbers (its columns: %s)." % (", ".join(map(str, table.columns)) or "none"))
+    rows = [
+        {"column": str(name), "count": int(values.count()), "mean": float(values.mean()), "min": float(values.min()), "max": float(values.max())}
+        for name, values in numeric.items()
+    ]
+    return rows, {"rows": int(table.shape[0]), "columns": int(table.shape[1]), "numeric_columns": len(rows)}
+
+
+@tool("Count the pixels above a level")
+def count_above_level(
+    image: Annotated[Image, Axes("YX"), Group("Image"), Description("A 2D image")],
+    mode: Annotated[Literal["fixed", "percentile"], Widget("radio"), Group("Level"), Description("Give the level itself, or the percentile of the pixel values it sits at")] = "fixed",
+    level: Annotated[float, EnabledWhen("mode", "fixed"), Group("Level"), Description("The pixel value (used when the mode is 'fixed')")] = 128.0,
+    percentile: Annotated[float, Min(0), Max(100), EnabledWhen("mode", "percentile"), Group("Level"), Description("The percentile (used when the mode is 'percentile')")] = 99.0,
+) -> Scalars:
+    """Counts the pixels at or above a level. The level or the percentile is only meaningful for its mode, so a host greys the other one out (the tool still accepts both)."""
+    import numpy as np
+
+    used = float(level) if mode == "fixed" else float(np.percentile(image, percentile))
+    count = int((image >= used).sum())
+    return {"level_used": used, "pixels": count, "fraction": count / image.size}
+
+
+@tool("Area of the bright region")
+def bright_area(
+    image: Annotated[Image, Axes("YX"), Group("Image"), Description("A 2D image")],
+    pixel_size: Annotated[
+        Optional[float], PixelSizeOf("image"), Unit("um/px"), Group("Image"),
+        Description("Size of a pixel of the image. A host fills it from the image's calibration; if the image has none, set it here. There is no stand-in value: an unknown pixel size stops the run"),
+    ] = None,
+    threshold: Annotated[float, Min(0), Max(1), Widget("slider"), Group("Image"), Description("Fraction of the maximum above which a pixel is bright")] = 0.5,
+) -> Scalars:
+    """The area of the bright region in square micrometres. It never guesses the pixel size: with no calibration the run is refused, not given a made-up area."""
+    if pixel_size is None:
+        raise ToolError("pixel_size_unknown", "The pixel size of the image is unknown, so an area in um2 cannot be given. Set 'pixel_size' (um per pixel) or calibrate the image.")
+    if not pixel_size > 0:
+        raise ToolError("invalid_pixel_size", "The pixel size must be above 0 um/px (it is %g)." % pixel_size)
+    bright = int((image > threshold * image.max()).sum()) if image.max() > 0 else 0
+    return {"bright_pixels": bright, "pixel_size_um": pixel_size, "area_um2": bright * pixel_size * pixel_size}
+
+
+@tool("Align the centres of two images")
+def align_centres(
+    image: Annotated[Image, Axes("YX"), Group("Images"), Description("The image to move")],
+    reference: Annotated[Image, Axes("YX"), Group("Images"), Description("The image to move it onto")],
+) -> Annotated[Affine, ApplyTo("image", "reference"), Name("alignment")]:
+    """The translation that moves the intensity centre of one image onto that of the other, as a 3x3 matrix (pixels of the image to pixels of the reference, y then x); a host shows the moved image on the reference."""
+    import numpy as np
+
+    def centre(array, name):
+        total = float(array.sum())
+        if total <= 0:
+            raise ToolError("no_signal", "The %s has no signal (its sum is not above 0), so it has no centre." % name)
+        yy, xx = np.indices(array.shape)
+        return float((yy * array).sum() / total), float((xx * array).sum() / total)
+
+    (y0, x0), (y1, x1) = centre(image.astype(float), "image"), centre(reference.astype(float), "reference")
+    return [[1.0, 0.0, y1 - y0], [0.0, 1.0, x1 - x0], [0.0, 0.0, 1.0]]
 
 
 # ------------------------------------------------------------------------------------------------ stress (what a host must survive)

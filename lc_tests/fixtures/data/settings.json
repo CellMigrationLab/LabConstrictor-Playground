@@ -1,0 +1,6 @@
+{
+  "name": "demo",
+  "threshold": 0.5,
+  "channels": 3,
+  "normalise": true
+}

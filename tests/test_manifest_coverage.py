@@ -26,15 +26,7 @@ MODULE = "labconstrictor_playground_lc_tools"
 
 # Items the Playground intentionally does not exercise, each with the reason. Keep it short; every line is a review decision.
 # Keys are catalogue names ("marker Foo", "input Foo", "output Foo", "widget 'foo'").
-# The first five are KNOWN GAPS found when this rule was introduced (not design decisions): the tour has no tool that takes a table or a
-# file, shows a dependent parameter, links a pixel size, or returns a matrix. Each should leave this list by getting a tool.
-NOT_IN_THE_PLAYGROUND: dict[str, str] = {
-    "input Table": "known gap: no Playground tool takes a CSV table yet; add one to the tour and remove this line",
-    "input File": "known gap: no Playground tool takes a single file yet; add one to the tour and remove this line",
-    "marker EnabledWhen": "known gap: no Playground parameter is greyed out by another yet; add one to the tour and remove this line",
-    "marker PixelSizeOf": "known gap: the tour image has no pixel-size parameter yet; add one and remove this line",
-    "output Affine": "known gap: no Playground tool returns a registration matrix yet; add one and remove this line",
-}
+NOT_IN_THE_PLAYGROUND: dict[str, str] = {}
 
 
 def catalogue() -> set[str]:
