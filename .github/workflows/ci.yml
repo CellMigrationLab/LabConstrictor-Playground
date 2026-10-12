@@ -44,6 +44,7 @@ jobs:
         run: python -m pytest tests -v
 
       - name: Run the tool test cases and the declaration check
+        if: ${{ !cancelled() }}  # also when pytest failed, so one run shows both
         run: |
           labconstrictor-tools check --module labconstrictor_playground_lc_tools
           labconstrictor-tools test --module labconstrictor_playground_lc_tools --cases lc_tests/cases.json
