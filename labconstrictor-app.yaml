@@ -14,6 +14,7 @@ status: Available
 inputs:
   - "Run a small test on a device: the device chosen in a dropdown (cpu, cuda:0, mps, whatever PyTorch can use here)"
   - "Feature tour: an image, or none to use a built-in demo image"
+  - "Look inside a file (a text or JSON file), Summarise a table (a CSV), Count the pixels above a level (a level that another setting switches on), Area of the bright region (needs the pixel size, never guesses it), Align the centres of two images (returns a 3x3 transform)"
 outputs:
   - "A readout with a tick, a warning or a cross per layer, with what to do beside each cross"
   - "report.json (to attach to an issue) and summary.txt, plus benchmark.png when there is a benchmark"

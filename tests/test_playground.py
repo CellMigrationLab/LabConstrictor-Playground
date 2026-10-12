@@ -46,7 +46,7 @@ def test_the_declarations_stay_light_and_are_valid():
     done = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, env=_child_env())
     assert done.returncode == 0, done.stderr
     assert done.stdout.split() == sorted(
-        ["check_everything", "feature_tour", "list_devices", "make_test_data", "run_on_device", "stress_big_image", "stress_crash", "stress_hang", "stress_many_points", "stress_out_of_memory", "stress_real_memory", "stress_slow"]
+        ["align_centres", "bright_area", "check_everything", "count_above_level", "feature_tour", "list_devices", "look_inside_file", "make_test_data", "run_on_device", "stress_big_image", "stress_crash", "stress_hang", "stress_many_points", "stress_out_of_memory", "stress_real_memory", "stress_slow", "summarise_table"]
     )
 
 

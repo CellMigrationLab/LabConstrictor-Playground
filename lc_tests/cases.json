@@ -272,5 +272,236 @@
       "code": "bad_input",
       "message_contains": "size of the image"
     }
+  },
+  {
+    "tool": "look_inside_file",
+    "inputs": {
+      "file": "fixtures/data/settings.json"
+    },
+    "comment": "a JSON file: its keys and plain values",
+    "expect": {
+      "results": {
+        "values": {
+          "kind": "json",
+          "keys": "channels, name, normalise, threshold",
+          "value_name": "demo",
+          "value_threshold": 0.5,
+          "value_channels": 3,
+          "value_normalise": true
+        }
+      }
+    }
+  },
+  {
+    "tool": "look_inside_file",
+    "inputs": {
+      "file": "fixtures/data/notes.txt"
+    },
+    "comment": "any other text: its number of lines",
+    "expect": {
+      "results": {
+        "values": {
+          "kind": "text",
+          "lines": 3
+        }
+      }
+    }
+  },
+  {
+    "tool": "look_inside_file",
+    "inputs": {
+      "file": "fixtures/data/square_a.tif"
+    },
+    "comment": "a binary file is refused, not shown as garbage",
+    "expect": {
+      "status": "FAILED",
+      "code": "not_text",
+      "message_contains": "square_a.tif"
+    }
+  },
+  {
+    "tool": "summarise_table",
+    "inputs": {
+      "table": "fixtures/data/measurements.csv"
+    },
+    "comment": "known answer: length 10,20,30 and width 2,4,6; the id column counts as numbers, the group column does not",
+    "expect": {
+      "results": {
+        "summary": {
+          "columns": [
+            "column",
+            "count",
+            "mean",
+            "min",
+            "max"
+          ],
+          "rows": 3,
+          "cells": {
+            "mean[1]": 20.0,
+            "max[1]": 30.0,
+            "mean[2]": 4.0,
+            "min[2]": 2.0
+          }
+        },
+        "values": {
+          "rows": 3,
+          "columns": 4,
+          "numeric_columns": 3
+        }
+      }
+    }
+  },
+  {
+    "tool": "count_above_level",
+    "inputs": {
+      "image": "fixtures/data/square_a.tif",
+      "mode": "fixed",
+      "level": 100
+    },
+    "comment": "known answer: a 4 x 4 square of 255 in a 32 x 32 image",
+    "expect": {
+      "results": {
+        "values": {
+          "pixels": 16,
+          "level_used": 100.0
+        }
+      }
+    }
+  },
+  {
+    "tool": "count_above_level",
+    "inputs": {
+      "image": "fixtures/data/square_a.tif",
+      "mode": "percentile",
+      "percentile": 99
+    },
+    "comment": "the 99th percentile of the pixel values is 255 (16 of 1024 pixels are 255)",
+    "expect": {
+      "results": {
+        "values": {
+          "pixels": 16,
+          "level_used": 255.0
+        }
+      }
+    }
+  },
+  {
+    "tool": "count_above_level",
+    "inputs": {
+      "image": "fixtures/data/square_a.tif",
+      "mode": "percentile",
+      "percentile": 99,
+      "level": 999
+    },
+    "comment": "a parameter that is greyed out in a host is still accepted: the level is ignored in percentile mode",
+    "expect": {
+      "results": {
+        "values": {
+          "pixels": 16
+        }
+      }
+    }
+  },
+  {
+    "tool": "bright_area",
+    "inputs": {
+      "image": "fixtures/data/square_a.tif",
+      "pixel_size": 0.5
+    },
+    "comment": "known answer: 16 bright pixels of 0.5 um = 4 um2",
+    "expect": {
+      "results": {
+        "values": {
+          "bright_pixels": 16,
+          "area_um2": 4.0
+        }
+      }
+    }
+  },
+  {
+    "tool": "bright_area",
+    "inputs": {
+      "image": "fixtures/data/square_a.tif"
+    },
+    "comment": "no pixel size: the run is refused, there is no default stand-in",
+    "expect": {
+      "status": "FAILED",
+      "code": "pixel_size_unknown",
+      "message_contains": "pixel size"
+    }
+  },
+  {
+    "tool": "bright_area",
+    "inputs": {
+      "image": "fixtures/data/square_a.tif",
+      "pixel_size": 0
+    },
+    "comment": "a pixel size of 0 is refused",
+    "expect": {
+      "status": "FAILED",
+      "code": "invalid_pixel_size"
+    }
+  },
+  {
+    "tool": "align_centres",
+    "inputs": {
+      "image": "fixtures/data/square_a.tif",
+      "reference": "fixtures/data/square_b.tif"
+    },
+    "comment": "known answer: the squares' centres are (5.5, 9.5) and (15.5, 21.5): a translation by (10, 12)",
+    "expect": {
+      "results": {
+        "alignment": {
+          "matrix": [
+            [
+              1,
+              0,
+              10
+            ],
+            [
+              0,
+              1,
+              12
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        }
+      }
+    }
+  },
+  {
+    "tool": "align_centres",
+    "inputs": {
+      "image": "fixtures/data/square_a.tif",
+      "reference": "fixtures/data/square_a.tif"
+    },
+    "comment": "an image onto itself: the identity",
+    "expect": {
+      "results": {
+        "alignment": {
+          "matrix": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ]
+        }
+      }
+    }
   }
 ]
