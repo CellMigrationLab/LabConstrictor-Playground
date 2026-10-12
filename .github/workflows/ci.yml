@@ -1,0 +1,50 @@
+name: Tests
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    name: pytest (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        # macos-latest is Apple silicon (arm64); Intel Macs are not supported.
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    env:
+      PYTHONUTF8: "1"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install the Playground and the Tools (from git main)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest "git+https://github.com/CellMigrationLab/LabConstrictor-Tools@main"
+          python -m pip install -e .
+          # PyTorch for the device tests of lc_tests/cases.json (the CPU build; macOS and Windows wheels are CPU builds already)
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple
+
+      - name: Run the tests
+        run: python -m pytest tests -v
+
+      - name: Run the tool test cases and the declaration check
+        if: ${{ !cancelled() }}  # also when pytest failed, so one run shows both
+        run: |
+          labconstrictor-tools check --module labconstrictor_playground_lc_tools
+          labconstrictor-tools test --module labconstrictor_playground_lc_tools --cases lc_tests/cases.json
