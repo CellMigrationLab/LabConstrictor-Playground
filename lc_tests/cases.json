@@ -146,9 +146,11 @@
   },
   {
     "tool": "stress_out_of_memory",
-    "comment": "no memory: a readable failure, not a crash",
+    "comment": "SIMULATED out of memory (nothing is allocated): a readable failure with the code MemoryError, not a crash",
     "expect": {
-      "status": "FAILED"
+      "status": "FAILED",
+      "code": "MemoryError",
+      "message_contains": "SIMULATED"
     }
   },
   {
