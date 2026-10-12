@@ -124,6 +124,44 @@ def test_slow_stops_when_cancel_raises():
         stress.slow(5, lambda f, m: None, cancelled)
 
 
+def test_two_reports_in_the_same_second_are_both_kept(tmp_path, monkeypatch):
+    from labconstrictor_tools.diagnostics import Check
+
+    monkeypatch.setattr(checks.time, "strftime", lambda fmt: "check_20260101_120000")  # a frozen clock
+    drawn = []
+
+    def figure(found, path):
+        if not any(c.layer == "benchmark" for c in found):
+            return None
+        path.write_bytes(b"png")
+        drawn.append(path)
+        return path
+
+    monkeypatch.setattr(checks, "benchmark_figure", figure)
+    first = [Check("machine", "RAM", "ok", "first run"), Check("benchmark", "cpu", "info", "1.0 ms")]
+    second = [Check("machine", "RAM", "warn", "second run")]
+    one = checks.write_report(first, tmp_path)
+    two = checks.write_report(second, tmp_path)
+    assert one["json"].parent != two["json"].parent
+    assert len([p for p in tmp_path.iterdir() if p.is_dir()]) == 2
+    assert all(p.parent.name.startswith("check_20260101_120000") for p in (one["json"], two["json"]))
+    assert json.loads(one["json"].read_text(encoding="utf-8"))["checks"][0]["detail"] == "first run"
+    assert json.loads(two["json"].read_text(encoding="utf-8"))["checks"][0]["detail"] == "second run"
+    assert "figure" in one and drawn == [one["figure"]]
+    assert "figure" not in two and not (two["json"].parent / "benchmark.png").exists()
+
+
+def test_a_taken_report_folder_is_never_reused(tmp_path, monkeypatch):
+    monkeypatch.setattr(checks.time, "strftime", lambda fmt: "check_20260101_120000")
+    suffixes = iter(["aaaaaaaa", "aaaaaaaa", "bbbbbbbb"])
+    monkeypatch.setattr(checks.uuid, "uuid4", lambda: type("U", (), {"hex": next(suffixes) + "0" * 24})())
+    first = checks.new_report_folder(tmp_path)
+    (first / "report.json").write_text("keep me", encoding="utf-8")
+    second = checks.new_report_folder(tmp_path)  # the same suffix is drawn once more: it must retry
+    assert first.name.endswith("aaaaaaaa") and second.name.endswith("bbbbbbbb")
+    assert (first / "report.json").read_text(encoding="utf-8") == "keep me" and not list(second.iterdir())
+
+
 def test_simulated_out_of_memory_is_deterministic_labelled_and_allocates_nothing(monkeypatch):
     import tracemalloc
 
