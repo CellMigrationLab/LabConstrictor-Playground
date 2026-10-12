@@ -13,5 +13,6 @@ setup(
         "scipy",
         "matplotlib",
         "tifffile",
+        "scikit-image",
     ],
 )
