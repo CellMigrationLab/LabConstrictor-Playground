@@ -3,13 +3,14 @@ schema: 1
 name: LabConstrictor Playground
 summary: Check that a computer, an installation and its GPU are in order, and that every LabConstrictor feature works.
 description: |-
-  Press "Check everything" to get a readout of your machine, GPU, PyTorch, a short benchmark and the internet connection, plus a report you can attach to an issue. Developers use its tools as a fixed set of cases for the Napari, Fiji and QuPath bridge.
+  Press "Check everything" to get a readout of your machine, GPU, PyTorch, a short benchmark and the internet connection, plus a report you can attach to an issue. Developers use its tools as a fixed set of cases for the napari, Fiji and QuPath bridge.
 kind: utility
 hosts: [notebook, napari, fiji, qupath]
 distribution:
   installer: true
 license: MIT
 categories: [diagnostics, testing]
+status: Available
 inputs:
   - "Run a small test on a device: the device chosen in a dropdown (cpu, cuda:0, mps, whatever PyTorch can use here)"
   - "Feature tour: an image, or none to use a built-in demo image"
@@ -24,4 +25,4 @@ quickstart:
   - "Install it like any LabConstrictor app and press Check everything"
   - "Read the answer: a tick is fine, a warning works but something will bite later, a cross is broken and the line below says what to do"
   - "Attach report.json to an issue"
-  - "The tools also appear in Napari (Plugins > LabConstrictor tools) and Fiji (Plugins > LabConstrictor > LabConstrictor Tools...)"
+  - "The tools also appear in napari (Plugins > LabConstrictor tools) and Fiji (Plugins > LabConstrictor > LabConstrictor Tools...)"
