@@ -240,3 +240,10 @@ def test_real_memory_pressure_for_real_opt_in():
     result = stress.real_memory_pressure(target_mb=64, limit_mb=32, timeout=60)
     assert result["outcome"] in {"memory_error", "completed"}, result
     assert 0 <= result["allocated_mb"] <= 64
+
+
+def test_the_package_imports_without_labconstrictor_tools():
+    """post_install runs `import labconstrictor_playground` BEFORE it installs labconstrictor-tools, so the import must not need it."""
+    code = "import sys\nsys.modules['labconstrictor_tools'] = None  # makes `import labconstrictor_tools` fail\nimport labconstrictor_playground\nprint('imported')\n"
+    done = subprocess.run([sys.executable, "-c", code], env=_child_env(), capture_output=True, text=True, timeout=60)
+    assert done.returncode == 0 and "imported" in done.stdout, done.stderr
