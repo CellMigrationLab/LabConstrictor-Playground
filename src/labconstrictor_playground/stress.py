@@ -39,12 +39,19 @@ def slow(seconds: float, step, cancelled) -> float:
 
 
 def crash() -> None:
-    """Kill the process the way a native library does: a real segmentation fault (an access violation on Windows), not an exception and not a
-    chosen exit code (hosts read the exit code to say what happened, so a made-up one would be misleading)."""
+    """Kill the process the way a native library does: a real fault (SIGSEGV on POSIX, an access violation on Windows), not an exception and not
+    a chosen exit code (hosts read the exit code to say what happened, so a made-up one would be misleading).
+
+    `faulthandler._read_null` reads address 0, so the operating system itself raises the fault: exit code -11 on Linux and macOS, 0xC0000005
+    (3221225477) on Windows. `faulthandler._sigsegv` is NOT used first: it only *raises* the signal, and on Windows the C runtime ends the process
+    with exit code 3 for that, which a host reads as "the tool module failed to import". `ctypes.string_at(0)` is not a crash on Windows either
+    (ctypes turns the access violation into an OSError)."""
     import faulthandler
 
-    if hasattr(faulthandler, "_sigsegv"):  # a real fault on every platform; ctypes.string_at(0) only raises OSError on Windows
-        faulthandler._sigsegv()
+    for name in ("_read_null", "_sigsegv"):  # both exist in CPython 3.10 to 3.13; they are debugging helpers, so look them up
+        fault = getattr(faulthandler, name, None)
+        if fault is not None:
+            fault()
     import ctypes
 
     ctypes.string_at(0)
