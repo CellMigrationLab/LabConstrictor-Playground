@@ -8,14 +8,16 @@ import time
 import uuid
 from pathlib import Path
 
-from labconstrictor_tools import diagnostics
-from labconstrictor_tools.diagnostics import FAIL, INFO, OK, WARN, Check
+# labconstrictor_tools is imported inside the functions: the installer imports this package (post_install: "import labconstrictor_playground")
+# BEFORE it installs labconstrictor-tools, so an import at the top of this module makes the installation fail.
 
 INSTALL_LOG = "menuinst_debug.log"
 
 
 def install_log_probe(prefix: str | Path | None = None) -> list[Check]:
     """What the installer decided about PyTorch (CPU or GPU requirements, and whether it had to fall back), from the install log."""
+    from labconstrictor_tools.diagnostics import INFO, WARN, Check
+
     log = Path(prefix or sys.prefix) / INSTALL_LOG
     if not log.is_file():
         return [Check("install", "install log", INFO, "no install log at %s (a source checkout or a manual install)" % log)]
@@ -37,11 +39,15 @@ def install_log_probe(prefix: str | Path | None = None) -> list[Check]:
 
 
 def check_everything(*, benchmark: bool = True, network: bool = False) -> list[Check]:
+    from labconstrictor_tools import diagnostics
+
     return diagnostics.run_checks(benchmark=benchmark, network=network, extra=[install_log_probe])
 
 
 def benchmark_figure(checks: list[Check], path: Path) -> Path | None:
     """A bar chart of the benchmark (milliseconds per device); None when there is nothing to draw or no matplotlib."""
+    from labconstrictor_tools import diagnostics
+
     times = diagnostics.benchmark_timings(checks)
     if not times:
         return None
@@ -80,6 +86,8 @@ def new_report_folder(parent: str | Path) -> Path:
 
 def write_report(checks: list[Check], folder: str | Path) -> dict[str, Path]:
     """report.json (attach it to an issue), summary.txt and, when there is a benchmark, benchmark.png, in a new folder of its own (never reused)."""
+    from labconstrictor_tools import diagnostics
+
     folder = new_report_folder(folder)
     files = {"json": folder / "report.json", "summary": folder / "summary.txt"}
     files["json"].write_text(diagnostics.as_json(checks), encoding="utf-8")
