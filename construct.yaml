@@ -1,5 +1,5 @@
 name: LabConstrictorPlayground
-version: 0.0.2
+version: 0.0.3
 
 environment_file: environment.yaml
 installer_type: all
@@ -9,13 +9,14 @@ welcome_image: app/logo/logo.png
 header_image: app/logo/logo.png
 icon_image: app/logo/labconstrictor_playground.png
 
-conclusion_text: 'Thank you! You have successfully installed LabConstrictorPlayground 0.0.2.'
+conclusion_text: 'Thank you! You have successfully installed LabConstrictorPlayground 0.0.3.'
 
 keep_pkgs: false
 register_python: false
 initialize_conda: false
 
 extra_files:
+- .tools/meta/src_change.yaml: LabConstrictorPlayground/src_change.yaml
 - app/bash_bat_scripts/pre_uninstall.sh: pre_uninstall.sh
 - app/bash_bat_scripts/uninstall.sh: uninstall.sh
 - app/logo/labconstrictor_playground.icns: LabConstrictorPlayground/labconstrictor_playground.icns
