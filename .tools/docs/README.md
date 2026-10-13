@@ -9,6 +9,7 @@ This file temporarily lists all internal LabConstrictor documentation. After you
 - [Enable automatic template updates](template_synchronization.md)
 - [Initialise your repository](initialise_repository.md)
 - [Upload external code (optional)](external_code_upload.md)
+- [Expose tools to Napari and Fiji (experimental)](tools_bridge.md)
 - [Generate notebook requirements](notebook_requirements.md)
 - [Upload your notebooks](notebook_upload.md)   
 - [Create executable installers](executable_creation.md)
