@@ -1,5 +1,5 @@
 name: LabConstrictorPlayground
-version: 0.0.1
+version: 0.0.2
 
 environment_file: environment.yaml
 installer_type: all
@@ -9,14 +9,13 @@ welcome_image: app/logo/logo.png
 header_image: app/logo/logo.png
 icon_image: app/logo/labconstrictor_playground.png
 
-conclusion_text: 'Thank you! You have successfully installed LabConstrictorPlayground 0.0.1.'
+conclusion_text: 'Thank you! You have successfully installed LabConstrictorPlayground 0.0.2.'
 
 keep_pkgs: false
 register_python: false
 initialize_conda: false
 
 extra_files:
-- .tools/meta/src_change.yaml: LabConstrictorPlayground/src_change.yaml
 - app/bash_bat_scripts/pre_uninstall.sh: pre_uninstall.sh
 - app/bash_bat_scripts/uninstall.sh: uninstall.sh
 - app/logo/labconstrictor_playground.icns: LabConstrictorPlayground/labconstrictor_playground.icns
@@ -37,6 +36,7 @@ extra_files:
 - src/labconstrictor_playground/checks.py: LabConstrictorPlayground/src/labconstrictor_playground/checks.py
 - src/labconstrictor_playground/data.py: LabConstrictorPlayground/src/labconstrictor_playground/data.py
 - src/labconstrictor_playground/stress.py: LabConstrictorPlayground/src/labconstrictor_playground/stress.py
+- src/labconstrictor_playground/timing.py: LabConstrictorPlayground/src/labconstrictor_playground/timing.py
 - src/labconstrictor_playground/tour.py: LabConstrictorPlayground/src/labconstrictor_playground/tour.py
 - src/labconstrictor_playground_lc_tools/__init__.py: LabConstrictorPlayground/src/labconstrictor_playground_lc_tools/__init__.py
 
