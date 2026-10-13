@@ -247,3 +247,11 @@ def test_the_package_imports_without_labconstrictor_tools():
     code = "import sys\nsys.modules['labconstrictor_tools'] = None  # makes `import labconstrictor_tools` fail\nimport labconstrictor_playground\nprint('imported')\n"
     done = subprocess.run([sys.executable, "-c", code], env=_child_env(), capture_output=True, text=True, timeout=60)
     assert done.returncode == 0 and "imported" in done.stdout, done.stderr
+
+
+def test_crash_is_a_real_fault_not_exit_code_3():
+    """Windows ends a process with exit code 3 when a SIGSEGV is only raised (faulthandler._sigsegv); hosts read 3 as 'the tool module failed to
+    import'. The crash must be a real fault: -11 on POSIX, an access violation (0xC0000005) on Windows."""
+    done = subprocess.run([sys.executable, "-c", "from labconstrictor_playground import stress; stress.crash()"], env=_child_env(), capture_output=True, text=True, timeout=60)
+    expected = (3221225477, -1073741819) if os.name == "nt" else (-11,)
+    assert done.returncode in expected, "exit code %s, stderr: %s" % (done.returncode, done.stderr[-300:])
