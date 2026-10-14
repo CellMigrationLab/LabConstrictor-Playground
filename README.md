@@ -16,6 +16,12 @@
 - **Developers** use its tools as a fixed set of cases for the tools bridge: a dropdown that follows another tool, replace, messages, points, channels, large results, cancel, a crash, no memory (simulated), a tool that ignores Cancel.
 - **App authors** get the same checks for their own app in three lines (`labconstrictor_tools.diagnostics`, see the Tools repository).
 
+## What a passing check means
+
+A passing **Check everything** is an installation and machine check: it looks at this computer, the worker, the GPU libraries and the installer's log. It does not test the Napari, Fiji or QuPath integration, which needs the tools to be run from each host. The stress and diagnostic tools below are meant for developers and testers, as fixed cases for the tools bridge.
+
+Host tests and how to install the bridge are described in the [LabConstrictor-Tools docs](https://github.com/CellMigrationLab/LabConstrictor-Tools/tree/main/docs). This repository only holds the app and its tools.
+
 ## The tools (Napari, Fiji, QuPath, command line)
 
 | Tool | What it does |
