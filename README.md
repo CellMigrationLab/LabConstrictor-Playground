@@ -36,13 +36,7 @@
 
 Download the installer for your system from the [Releases](https://github.com/CellMigrationLab/LabConstrictor-Playground/releases) page (Windows, Apple Silicon Mac, Linux; Intel Macs are not supported) and run it. The installer detects an NVIDIA GPU and installs the matching PyTorch (CUDA) build; if that fails it falls back to the CPU build and records what happened in its log, which **Check everything** reads back to you. Apple Silicon uses Metal ("mps") with the standard build.
 
-Install rules:
-
-- Install into a folder whose full path has **no space** (for example `C:\LabConstrictorPlayground`, not `C:\My Apps\Playground`). The installer refuses such a path and writes nothing; the default folder fails the same way for a user name with a space, so choose another one.
-- Updating: on Windows and macOS uninstall the old version first. On Linux `bash <installer>.sh -u` updates in place, but only if the previous installation **finished**; after a failed one delete `<install folder>/pkgs` (or uninstall) first.
-- Tagged installs: the installer takes the Tools from a fixed release (`LC_TOOLS_PIN` in `app/bash_bat_scripts/post_install.sh`, now `v0.3.0-alpha.1`), never from `main`, and so does the Colab notebook; `tests/test_tools_pin.py` checks that both name the same tag.
-
-The tools appear in Napari (**Plugins > LabConstrictor tools**), Fiji (**Plugins > LabConstrictor > LabConstrictor Tools...**) and QuPath once those hosts are set up; their install pages: [Napari](https://github.com/CellMigrationLab/LabConstrictor-napari#install), [Fiji](https://github.com/CellMigrationLab/LabConstrictor-Fiji#install), [QuPath](https://github.com/CellMigrationLab/LabConstrictor-QuPath#install). From a terminal:
+The tools appear in Napari (**Plugins > LabConstrictor tools**), Fiji (**Plugins > LabConstrictor > LabConstrictor Tools...**) and QuPath once those hosts are set up; how to install and test the bridge: [LabConstrictor-Tools docs](https://github.com/CellMigrationLab/LabConstrictor-Tools/tree/main/docs); their install pages: [Napari](https://github.com/CellMigrationLab/LabConstrictor-napari#install), [Fiji](https://github.com/CellMigrationLab/LabConstrictor-Fiji#install), [QuPath](https://github.com/CellMigrationLab/LabConstrictor-QuPath#install). From a terminal:
 
 ```
 <install folder>/bin/python -m labconstrictor_tools run LabConstrictorPlayground check_everything
