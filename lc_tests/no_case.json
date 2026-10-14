@@ -1,0 +1,4 @@
+{
+  "stress_hang": "no grace-period kill in the case runner; covered by the host test suites and the sandbox extras",
+  "stress_real_memory": "opt-in, uses real memory; covered by the sandbox extras"
+}
