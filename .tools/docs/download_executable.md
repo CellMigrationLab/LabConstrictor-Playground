@@ -10,7 +10,7 @@ Choose your operating system and follow the instructions below to install PROJEC
 
 ## 1. Click the button to download PROJECT_NAME executable
 
-<a href="https://github.com/GITHUB_OWNER/GITHUB_REPO_NAME/releases/download/0.0.3/PROJECT_NAME-0.0.3-Windows-x86_64.exe">
+<a href="https://github.com/GITHUB_OWNER/GITHUB_REPO_NAME/releases/download/0.0.4/PROJECT_NAME-0.0.4-Windows-x86_64.exe">
     <img src="https://img.shields.io/badge/Download%20for%20Windows-Latest-blue?logo=windows&style=for-the-badge" alt="Download for Windows" width="250">
 </a>
 
@@ -48,7 +48,7 @@ Then, start using it following the instructions on the [Usage of Notebooks After
 
 ## 1. Click the button to download PROJECT_NAME executable
 
-<a href="https://github.com/GITHUB_OWNER/GITHUB_REPO_NAME/releases/download/0.0.3/PROJECT_NAME-0.0.3-Linux-x86_64.sh">
+<a href="https://github.com/GITHUB_OWNER/GITHUB_REPO_NAME/releases/download/0.0.4/PROJECT_NAME-0.0.4-Linux-x86_64.sh">
     <img src="https://img.shields.io/badge/Download%20for%20Linux-Latest-green?logo=linux&style=for-the-badge" alt="Download for Linux" width="250">
 </a>
 
@@ -61,7 +61,7 @@ Then, start using it following the instructions on the [Usage of Notebooks After
 2.- Copy and paste the following command:
 
 ```bash
-bash PROJECT_NAME-0.0.3-Linux-x86_64.sh
+bash PROJECT_NAME-0.0.4-Linux-x86_64.sh
 ```
 
 3.- Click Enter to run the command.
@@ -108,7 +108,7 @@ First of all, you will need to choose whether you want to install it with **(A) 
 > 2. Select About This Mac.
 > 3. A window will pop up displaying your Mac’s information. Look into the `Chip` or `Processor` field. Only Macs with an Apple silicon chip (`Mx`, e.g. M1 or M2) are supported; if it says `Intel`, this application is not available for your Mac.
 
-<a href="https://github.com/GITHUB_OWNER/GITHUB_REPO_NAME/releases/download/0.0.3/PROJECT_NAME-0.0.3-MacOSX-arm64.pkg">
+<a href="https://github.com/GITHUB_OWNER/GITHUB_REPO_NAME/releases/download/0.0.4/PROJECT_NAME-0.0.4-MacOSX-arm64.pkg">
     <img src="https://img.shields.io/badge/Download%20for%20Mac%20(ARM64)-Latest-lightgrey?logo=apple&style=for-the-badge" alt="Download for Mac ARM64" width="250">
 </a>
 
@@ -143,7 +143,7 @@ After installation, you can launch PROJECT_NAME from your Applications folder an
 > 2. Select About This Mac.
 > 3. A window will pop up displaying your Mac’s information. Look into the `Chip` or `Processor` field. Only Macs with an Apple silicon chip (`Mx`, e.g. M1 or M2) are supported; if it says `Intel`, this application is not available for your Mac.
 
-<a href="https://github.com/GITHUB_OWNER/GITHUB_REPO_NAME/releases/download/0.0.3/PROJECT_NAME-0.0.3-MacOSX-arm64.sh">
+<a href="https://github.com/GITHUB_OWNER/GITHUB_REPO_NAME/releases/download/0.0.4/PROJECT_NAME-0.0.4-MacOSX-arm64.sh">
     <img src="https://img.shields.io/badge/Download%20for%20Mac%20(ARM64)-Latest-lightgrey?logo=apple&style=for-the-badge" alt="Download for Mac ARM64" width="250">
 </a>
 
@@ -157,7 +157,7 @@ Follow the guidelines shown on the following GIF or the instructions bellow:
 1. Open a terminal on the folder where you downloaded the file.
 2. Copy and paste the following command:
     ```bash
-    bash PROJECT_NAME-0.0.3-MacOSX-ARCHITECTURE.sh
+    bash PROJECT_NAME-0.0.4-MacOSX-ARCHITECTURE.sh
     ```
 3. Click Enter to run the command.
 4. Follow the on-screen prompts to complete the installation.
