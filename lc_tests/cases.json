@@ -503,5 +503,45 @@
         }
       }
     }
+  },
+  {
+    "tool": "count_above_level",
+    "inputs": {
+      "image": "fixtures/data/square_nan.tif",
+      "mode": "percentile",
+      "percentile": 99
+    },
+    "comment": "one NaN pixel: refused, not a silent wrong level",
+    "expect": {
+      "status": "FAILED",
+      "code": "non_finite_pixels",
+      "message_contains": "NaN"
+    }
+  },
+  {
+    "tool": "bright_area",
+    "inputs": {
+      "image": "fixtures/data/square_nan.tif",
+      "pixel_size": 0.5
+    },
+    "comment": "one NaN pixel: refused, not an area of 0",
+    "expect": {
+      "status": "FAILED",
+      "code": "non_finite_pixels",
+      "message_contains": "NaN"
+    }
+  },
+  {
+    "tool": "align_centres",
+    "inputs": {
+      "image": "fixtures/data/square_nan.tif",
+      "reference": "fixtures/data/square_a.tif"
+    },
+    "comment": "one NaN pixel: refused, not a NaN matrix",
+    "expect": {
+      "status": "FAILED",
+      "code": "non_finite_pixels",
+      "message_contains": "NaN"
+    }
   }
 ]

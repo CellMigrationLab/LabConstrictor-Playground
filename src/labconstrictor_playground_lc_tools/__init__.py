@@ -8,7 +8,7 @@ checks inside the functions, so that listing the tools stays instant (`import to
 """
 
 from pathlib import Path
-from typing import Annotated, Literal, Optional
+from typing import Annotated, Any, Literal, Optional
 
 from labconstrictor_tools import (
     Advanced,
@@ -54,6 +54,19 @@ REPORTS = "LabConstrictorPlayground" + "/reports"  # inside the user's home fold
 
 
 # ------------------------------------------------------------------------------------------------ checks
+def refuse_non_finite(image: Any, name: str = "image") -> None:
+    """A pixel that is NaN or infinite makes percentiles, maxima, sums and centres meaningless, and comparisons with NaN are silently False: the tool refuses the image
+    with a sentence instead of reporting a zero (or a NaN) as if it were a result."""
+    import numpy as np
+
+    bad = int(np.size(image) - np.count_nonzero(np.isfinite(image)))
+    if bad:
+        raise ToolError(
+            "non_finite_pixels",
+            "The %s has %d pixel(s) that are NaN or infinite, so the result would be wrong without saying so. Clean the image first (replace or crop out those pixels)." % (name, bad),
+        )
+
+
 @tool("Check everything")
 def check_everything(
     run_benchmark: Annotated[bool, Group("Checks"), Label("Run the speed test"), Description("Times a small convolution and matrix product on the CPU and on every GPU found, and checks that they agree")] = True,
@@ -125,7 +138,7 @@ def make_test_data(
     kind: Annotated[Literal["all", "three_channels", "rgb", "labels", "timelapse", "points"], Group("Data")] = "all",
     size: Annotated[int, Group("Data"), Min(32), Max(4096), Description("Side of the images in pixels")] = 256,
 ) -> tuple[Annotated[MessageOut, Name("files")], Scalars]:
-    """Writes small test files (a 3-channel image whose channels have the means 10, 20 and 30, an RGB image, labels, a time-lapse, points)."""
+    """Writes small test files (a 3-channel image: the first channel is 10 plus the nuclei (so its mean is above 10 and depends on the image size), the second and third are flat at 20 and 30; an RGB image, labels, a time-lapse, points)."""
     from labconstrictor_playground import make_test_data as make
 
     written = make(folder, kind, size)
@@ -233,6 +246,7 @@ def count_above_level(
     """Counts the pixels at or above a level. The level or the percentile is only meaningful for its mode, so a host greys the other one out (the tool still accepts both)."""
     import numpy as np
 
+    refuse_non_finite(image)
     used = float(level) if mode == "fixed" else float(np.percentile(image, percentile))
     count = int((image >= used).sum())
     return {"level_used": used, "pixels": count, "fraction": count / image.size}
@@ -252,6 +266,7 @@ def bright_area(
         raise ToolError("pixel_size_unknown", "The pixel size of the image is unknown, so an area in um2 cannot be given. Set 'pixel_size' (um per pixel) or calibrate the image.")
     if not pixel_size > 0:
         raise ToolError("invalid_pixel_size", "The pixel size must be above 0 um/px (it is %g)." % pixel_size)
+    refuse_non_finite(image)
     bright = int((image > threshold * image.max()).sum()) if image.max() > 0 else 0
     return {"bright_pixels": bright, "pixel_size_um": pixel_size, "area_um2": bright * pixel_size * pixel_size}
 
@@ -265,6 +280,7 @@ def align_centres(
     import numpy as np
 
     def centre(array, name):
+        refuse_non_finite(array, name)
         total = float(array.sum())
         if total <= 0:
             raise ToolError("no_signal", "The %s has no signal (its sum is not above 0), so it has no centre." % name)
