@@ -37,7 +37,7 @@ def make_test_data(folder: str | Path, kind: str = "all", size: int = 256, seed:
     radius = max(6, size // 16)
     blobs, centres = _blobs((size, size), 12, radius, rng)
     if "three_channels" in wanted:
-        # channel k has a different mean (10, 20, 30 plus the nuclei in channel 1): a tool that gets the wrong channel is caught
+        # every channel has a different mean (the first is 10 plus the nuclei, so its mean is above 10 and depends on the size; the others are flat at 20 and 30): a tool that gets the wrong channel is caught
         stack = np.zeros((3, size, size), np.uint16)
         stack[0] = 10 + 200 * blobs
         stack[1] = 20

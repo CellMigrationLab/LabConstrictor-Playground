@@ -84,3 +84,23 @@ def test_align_centres_is_the_translation_between_centres():
     with pytest.raises(ToolError) as refused:
         fn("align_centres")(np.zeros((8, 8)), square(1, 1))
     assert refused.value.code == "no_signal"
+
+
+def with_nan():
+    image = square(4, 8).astype(np.float32)
+    image[0, 0] = np.nan
+    return image
+
+
+def test_non_finite_pixels_are_refused_not_silently_dropped():
+    calls = (
+        ("count_above_level", (with_nan(), "percentile")),
+        ("count_above_level", (with_nan(), "fixed", 100.0)),
+        ("bright_area", (with_nan(), 0.5)),
+        ("align_centres", (with_nan(), square(4, 8))),
+        ("align_centres", (square(4, 8), with_nan())),
+    )
+    for tool_id, args in calls:
+        with pytest.raises(ToolError) as refused:
+            fn(tool_id)(*args)
+        assert refused.value.code == "non_finite_pixels", tool_id
