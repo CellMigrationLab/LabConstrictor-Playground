@@ -32,6 +32,8 @@ jobs:
         run: |
           set -euxo pipefail
           RAW="${{ github.event.release.tag_name }}"
+          # The tag as typed (v1.0.0 or 1.0.0): bump_version.py points the download links to it.
+          echo "RELEASE_TAG=$RAW" >> "$GITHUB_ENV"
           RAW="${RAW#v}"
           echo "release_version=$RAW" >> "$GITHUB_OUTPUT"
           echo "RELEASE_VERSION=$RAW" >> "$GITHUB_ENV"
@@ -61,6 +63,11 @@ jobs:
             "bump_Welcome_notebook.py" \
             .tools/python/bump_Welcome_notebook.py \
             python .tools/python/bump_Welcome_notebook.py "${{ github.repository_owner }}" "${{ github.event.repository.name }}"
+          bash .tools/bash/run_with_context.sh \
+            artifacts/error_log_document.log \
+            "check_placeholders.py" \
+            .tools/python/check_placeholders.py \
+            python .tools/python/check_placeholders.py
 
 
       - name: Commit updated versioned files
@@ -117,6 +124,8 @@ jobs:
             exit 1
           fi
 
+          # The tag as typed (v1.0.0 or 1.0.0): bump_version.py points the download links to it.
+          echo "RELEASE_TAG=$RAW" >> "$GITHUB_ENV"
           RAW="${RAW#v}"
           echo "release_version=$RAW" >> "$GITHUB_OUTPUT"
           echo "RELEASE_VERSION=$RAW" >> "$GITHUB_ENV"
@@ -146,6 +155,11 @@ jobs:
             "bump_Welcome_notebook.py" \
             .tools/python/bump_Welcome_notebook.py \
             python .tools/python/bump_Welcome_notebook.py "${{ github.repository_owner }}" "${{ github.event.repository.name }}"
+          bash .tools/bash/run_with_context.sh \
+            "artifacts/error_log_document.log" \
+            "check_placeholders.py" \
+            .tools/python/check_placeholders.py \
+            python .tools/python/check_placeholders.py
 
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@fc2d68f6413eb2d87b895e92f8584b5b94a10167 # v3
