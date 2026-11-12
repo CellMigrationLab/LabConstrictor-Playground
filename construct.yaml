@@ -1,5 +1,5 @@
 name: LabConstrictorPlayground
-version: 0.0.5
+version: 0.0.6
 
 environment_file: environment.yaml
 installer_type: all
@@ -9,7 +9,7 @@ welcome_image: app/logo/logo.png
 header_image: app/logo/logo.png
 icon_image: app/logo/labconstrictor_playground.png
 
-conclusion_text: 'Thank you! You have successfully installed LabConstrictorPlayground 0.0.5.'
+conclusion_text: 'Thank you! You have successfully installed LabConstrictorPlayground 0.0.6.'
 
 keep_pkgs: false
 register_python: false
