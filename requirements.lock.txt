@@ -1,0 +1,69 @@
+# Lock file of requirements.txt: every package the installer installs with pip, with its exact version.
+# Written by .tools/python/lock_requirements.py (uv 0.13.3, universal resolution for Python 3.12); do not edit it by hand.
+# It is written again only when requirements.txt, the Python or JupyterLab version changes (see the fingerprint below).
+# lock-input: sha256:ff287d02222f1088efa48e6d6d57c7ff03507e7c96ecdac53165c6bcb136d7b4
+
+asttokens==3.0.2
+colorama==0.4.6 ; sys_platform == 'win32'
+comm==0.2.3
+contourpy==1.4.0
+cycler==0.12.1
+executing==2.3.0
+filelock==4.2.10
+fonttools==4.68.0
+fsspec==2026.9.0
+imageio==2.38.1
+ipython==9.18.1
+ipython-pygments-lexers==1.1.1
+ipywidgets==8.1.7
+jedi==0.20.1
+jinja2==3.1.6
+jl-hidecode==0.0.1
+jupyterlab-widgets==3.0.17
+kiwisolver==1.5.1
+lazy-loader==0.6
+markupsafe==3.0.4
+matplotlib==3.10.0
+matplotlib-inline==0.2.2
+mpmath==1.3.0
+networkx==3.7
+numpy==2.0.2
+nvidia-cublas-cu12==12.8.4.1 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+nvidia-cuda-cupti-cu12==12.8.90 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+nvidia-cuda-nvrtc-cu12==12.8.93 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+nvidia-cuda-runtime-cu12==12.8.90 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+nvidia-cudnn-cu12==9.10.2.21 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+nvidia-cufft-cu12==11.3.3.83 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+nvidia-cufile-cu12==1.13.1.3 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+nvidia-curand-cu12==10.3.9.90 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+nvidia-cusolver-cu12==11.7.3.90 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+nvidia-cusparse-cu12==12.5.8.93 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+nvidia-cusparselt-cu12==0.7.1 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+nvidia-nccl-cu12==2.27.3 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+nvidia-nvjitlink-cu12==12.8.93 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+nvidia-nvtx-cu12==12.8.90 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+packaging==26.3
+pandas==2.2.2
+parso==0.8.7
+pexpect==4.9.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'
+pillow==13.0.0
+prompt-toolkit==3.0.53
+psutil==7.2.2 ; sys_platform != 'android' and sys_platform != 'cygwin' and sys_platform != 'emscripten'
+ptyprocess==0.7.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'
+pure-eval==0.2.4
+pygments==2.21.0
+pyparsing==3.3.3
+python-dateutil==4.0.0
+pytz==2026.6
+scikit-image==0.26.0
+scipy==1.16.3
+stack-data==0.6.3
+sympy==1.14.0
+tifffile==2026.4.11
+torch==2.8.0
+traitlets==5.16.1
+triton==3.4.0 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+typing-extensions==4.16.0
+tzdata==2026.6
+wcwidth==0.9.4
+widgetsnbextension==4.0.16
