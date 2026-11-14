@@ -6,6 +6,13 @@ description: |-
   Press "Check everything" to get a readout of your machine, GPU, PyTorch, a short benchmark and the internet connection, plus a report you can attach to an issue. Developers use its tools as a fixed set of cases for the napari, Fiji and QuPath bridge.
 kind: utility
 hosts: [notebook, napari, fiji, qupath]
+host_requirements:   # the oldest LabConstrictor plugins this app needs (LabConstrictor-Tools #155)
+  napari:
+    min_version: 0.1.0-alpha.5
+  fiji:
+    min_version: 0.1.0-alpha.7
+  qupath:
+    min_version: 0.1.0-alpha.7
 distribution:
   installer: true
 license: MIT
