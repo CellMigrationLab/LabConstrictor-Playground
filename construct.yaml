@@ -1,5 +1,5 @@
 name: LabConstrictorPlayground
-version: 0.0.6
+version: 0.0.7
 
 environment_file: environment.yaml
 installer_type: all
@@ -9,7 +9,7 @@ welcome_image: app/logo/logo.png
 header_image: app/logo/logo.png
 icon_image: app/logo/labconstrictor_playground.png
 
-conclusion_text: 'Thank you! You have successfully installed LabConstrictorPlayground 0.0.6.'
+conclusion_text: 'Thank you! You have successfully installed LabConstrictorPlayground 0.0.7.'
 
 keep_pkgs: false
 register_python: false
@@ -31,7 +31,9 @@ extra_files:
 - labconstrictor-app.yaml: LabConstrictorPlayground/labconstrictor-app.yaml
 - notebooks/LabConstrictorPlayground/LabConstrictorPlayground.ipynb: LabConstrictorPlayground/notebooks/LabConstrictorPlayground/LabConstrictorPlayground.ipynb
 - notebooks/notebook_latest_versions.yaml: LabConstrictorPlayground/notebook_latest_versions.yaml
+- requirements.lock.txt: LabConstrictorPlayground/requirements.lock.txt
 - requirements.txt: LabConstrictorPlayground/requirements.txt
+- requirements_gpu.lock.txt: LabConstrictorPlayground/requirements_gpu.lock.txt
 - requirements_gpu.txt: LabConstrictorPlayground/requirements_gpu.txt
 - setup.py: LabConstrictorPlayground/setup.py
 - src/labconstrictor_playground/__init__.py: LabConstrictorPlayground/src/labconstrictor_playground/__init__.py
