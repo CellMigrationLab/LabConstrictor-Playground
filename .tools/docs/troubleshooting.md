@@ -60,7 +60,7 @@ Diagnostic information is written to `launcher_debug.log` and
 same preflight used by the installer with:
 
 ```text
-<installation-prefix>\python.exe <installation-prefix>\PROJECT_NAME\launch_jupyter.py --self-test
+<installation-prefix>\python.exe <installation-prefix>\LabConstrictorPlayground\launch_jupyter.py --self-test
 ```
 
 The self-test reports the project-specific CA override variable. It is derived
