@@ -15,10 +15,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Date: 2026-10-08 07:01:38 +0300
 - Message: LabConstrictor Playground 0.1.0, part 2: the notebook (Check everything and Make test data buttons) (#3)
 
-Claude-Session: https://claude.ai/code/session_01Y2SN8SuEakTdiWy3F2WUqN
-
-Co-authored-by: Claude <noreply@anthropic.com>
-
 ---
 ## [0.1.0] - 2026-10-07
 
