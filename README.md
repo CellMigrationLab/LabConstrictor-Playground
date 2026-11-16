@@ -4,25 +4,59 @@
 
 # LabConstrictor Playground
 
-**Is this computer, this installation and its GPU in order?** One button answers, and the answer can be pasted into an issue. The other tools are fixed cases for checking each LabConstrictor feature by hand in Napari, Fiji and QuPath.
+**Is this computer, this installation and its GPU in order?** One button answers, and the answer can be pasted into an issue.
 
 </div>
 
----
+LabConstrictor Playground is a small test app. Its **Check everything** tool looks at your computer, the installation and the GPU libraries and tells you, line by line, what is fine and what to fix. Its other tools are small fixed examples for trying each feature of the LabConstrictor plugins in napari, Fiji and QuPath, with no scientific data needed. It is not a scientific analysis.
 
-## What it is for
+![napari running the Playground's Feature tour: blobs of a demo image come back as labels, outlines, points and a table](docs/img/napari-feature-tour.png)
 
-- **Testers** install it like any LabConstrictor app and press **Check everything**. They get a short readout (a tick, a warning or a cross per layer, with *what to do* beside each cross) and a `report.json` to attach to an issue. This is how we learn what works on Windows and macOS, with or without a GPU.
-- **Developers** use its tools as a fixed set of cases for the tools bridge: a dropdown that follows another tool, replace, messages, points, channels, large results, cancel, a crash, no memory (simulated), a tool that ignores Cancel.
-- **App authors** get the same checks for their own app in three lines (`labconstrictor_tools.diagnostics`, see the Tools repository).
+*The **Feature tour** tool in napari: one small segmentation that returns labels, outlines, points, a table and a message.*
+
+## Install
+
+Download the installer for your system from the [latest release](https://github.com/CellMigrationLab/LabConstrictor-Playground/releases/latest) (Windows, Apple Silicon Mac, Linux; Intel Macs are not supported) and run it. Step-by-step pictures: [Install an app](https://cellmigrationlab.github.io/LabConstrictor-Site/guides/install/).
+
+The installer detects an NVIDIA GPU and installs the matching PyTorch (CUDA) build; if that fails it falls back to the CPU build and records what happened in its log, which **Check everything** reads back to you. Apple Silicon uses Metal ("mps") with the standard build.
+
+## First use
+
+<img src="docs/img/check-everything.png" alt="The readout of Check everything in napari: 18 checks, 6 ok, no warnings, no failures" width="380" align="right">
+
+1. Set up the plugin for the program you use: [napari](https://cellmigrationlab.github.io/LabConstrictor-Site/guides/napari/), [Fiji](https://cellmigrationlab.github.io/LabConstrictor-Site/guides/fiji/) or [QuPath](https://cellmigrationlab.github.io/LabConstrictor-Site/guides/qupath/).
+2. Open the LabConstrictor tools there and pick **LabConstrictorPlayground**.
+3. Run **Check everything**. You get a short readout, a table of details and a `report.json` file to attach to an issue.
+4. Run **Feature tour** without choosing an image: it makes its own demo image and returns every kind of result.
+
+Without any of these programs, from a terminal:
+
+```
+<install folder>/bin/python -m labconstrictor_tools run LabConstrictorPlayground check_everything
+```
+
+<br clear="right">
+
+## Reading the answer
+
+| Mark | Meaning |
+|---|---|
+| ✔ | fine |
+| ⚠ | works, but something will bite later (low disk, a long path on Windows, the GPU build fell back to CPU) |
+| ✖ | broken; the line below it says what to do (for example "the driver is too old for this CUDA build: update the NVIDIA driver") |
+
+Honest limits: OpenCL on macOS is deprecated by Apple and ROCm (AMD) works on Linux only; this first version checks PyTorch only. TensorFlow is checked inside the apps that use it.
 
 ## What a passing check means
 
-A passing **Check everything** is an installation and machine check: it looks at this computer, the worker, the GPU libraries and the installer's log. It does not test the Napari, Fiji or QuPath integration, which needs the tools to be run from each host. The stress and diagnostic tools below are meant for developers and testers, as fixed cases for the tools bridge.
+A passing **Check everything** is a check of the installation and the machine: this computer, the worker, the GPU libraries and the installer's log. It does not test the napari, Fiji or QuPath plugins; for that, run the tools from each program.
 
-Host tests and how to install the bridge are described in the [LabConstrictor-Tools docs](https://github.com/CellMigrationLab/LabConstrictor-Tools/tree/main/docs). This repository only holds the app and its tools.
+## Getting help
 
-## The tools (Napari, Fiji, QuPath, command line)
+- Guides: the [LabConstrictor website](https://cellmigrationlab.github.io/LabConstrictor-Site/).
+- Bugs and questions: the [issue tracker](https://github.com/CellMigrationLab/LabConstrictor-Playground/issues). Attach the `report.json` of **Check everything**.
+
+## The tools
 
 | Tool | What it does |
 |---|---|
@@ -38,28 +72,10 @@ Host tests and how to install the bridge are described in the [LabConstrictor-To
 | **Align the centres of two images** | Returns a 3x3 transform (the translation that moves the intensity centre of one image onto that of the other) attached to the two images; a host shows the moved image on the reference. |
 | **Stress: ...** | A big image, many points (up to 2 million), a slow run with progress, a crash, no memory, a tool that ignores Cancel. The host must survive each of them and say what happened. *Out of memory (simulated)* raises a labelled `MemoryError` without using any memory, the same on every system; *Real memory pressure (bounded, opt-in)* is a separate tool in which a child process really uses at most 512 MB. |
 
-## Install
-
-Download the installer for your system from the [Releases](https://github.com/CellMigrationLab/LabConstrictor-Playground/releases) page (Windows, Apple Silicon Mac, Linux; Intel Macs are not supported) and run it. The installer detects an NVIDIA GPU and installs the matching PyTorch (CUDA) build; if that fails it falls back to the CPU build and records what happened in its log, which **Check everything** reads back to you. Apple Silicon uses Metal ("mps") with the standard build.
-
-The tools appear in Napari (**Plugins > LabConstrictor tools**), Fiji (**Plugins > LabConstrictor > LabConstrictor Tools...**) and QuPath once those hosts are set up; their install pages: [Napari](https://github.com/CellMigrationLab/LabConstrictor-napari#install), [Fiji](https://github.com/CellMigrationLab/LabConstrictor-Fiji#install), [QuPath](https://github.com/CellMigrationLab/LabConstrictor-QuPath#install). From a terminal:
-
-```
-<install folder>/bin/python -m labconstrictor_tools run LabConstrictorPlayground check_everything
-```
-
-## Reading the answer
-
-| Mark | Meaning |
-|---|---|
-| ✔ | fine |
-| ⚠ | works, but something will bite later (low disk, a long path on Windows, the GPU build fell back to CPU) |
-| ✖ | broken; the line below it says what to do (for example "the driver is too old for this CUDA build: update the NVIDIA driver") |
-
-Honest limits: OpenCL on macOS is deprecated by Apple and ROCm (AMD) works on Linux only; this first version checks PyTorch only. TensorFlow is checked inside the apps that use it.
-
-## Developers
+## For developers
 
 `src/labconstrictor_playground` holds the code (`checks.py`, `data.py`, `stress.py`, `timing.py`, `tour.py`), `src/labconstrictor_playground_lc_tools` the tool declarations, `lc_tests/` the tool cases (see its README), `tests/` the unit tests (CI runs `pytest tests`). The checks themselves are in [labconstrictor-tools](https://github.com/CellMigrationLab/LabConstrictor-Tools) (`labconstrictor_tools.diagnostics`), so every app can reuse them.
 
-Built from the [LabConstrictor](https://github.com/CellMigrationLab/LabConstrictor) template (see `.tools/docs`).
+To run the tests: `pip install pytest "git+https://github.com/CellMigrationLab/LabConstrictor-Tools@main"`, `pip install -e .`, then `pytest tests` (the device tests also need PyTorch). Built from the [LabConstrictor](https://github.com/CellMigrationLab/LabConstrictor) template.
+
+License: [MIT](LICENSE).
