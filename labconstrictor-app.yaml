@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://labconstrictor.cellmig.org/schema/labconstrictor-app.schema.json
+# yaml-language-server: $schema=https://cellmigrationlab.github.io/LabConstrictor-Site/schema/labconstrictor-app.schema.json
 schema: 1
 name: LabConstrictor Playground
 summary: Check that a computer, an installation and its GPU are in order, and that every LabConstrictor feature works.
