@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="app/logo/logo.png" width="420" alt="LabConstrictor Playground logo"/>
+<img src="app/logo/labconstrictor_playground.png" width="160" alt="LabConstrictor logo: a green snake around an orange notebook"/>
 
 # LabConstrictor Playground
 

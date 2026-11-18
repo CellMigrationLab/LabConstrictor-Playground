@@ -5,8 +5,8 @@ environment_file: environment.yaml
 installer_type: all
 license_file: LICENSE
 
-welcome_image: app/logo/logo.png
-header_image: app/logo/logo.png
+welcome_image: app/logo/welcome.png
+header_image: app/logo/header.png
 icon_image: app/logo/labconstrictor_playground.png
 
 conclusion_text: 'Thank you! You have successfully installed LabConstrictorPlayground 0.0.7.'
