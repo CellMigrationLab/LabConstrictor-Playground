@@ -26,7 +26,10 @@ MODULE = "labconstrictor_playground_lc_tools"
 
 # Items the Playground intentionally does not exercise, each with the reason. Keep it short; every line is a review decision.
 # Keys are catalogue names ("marker Foo", "input Foo", "output Foo", "widget 'foo'").
-NOT_IN_THE_PLAYGROUND: dict[str, str] = {}
+NOT_IN_THE_PLAYGROUND: dict[str, str] = {
+    "marker WithAxes": "first in Tools v0.3.0-alpha.4, but the Playground's installers still pin v0.3.0-alpha.2 (template 0.1.32), so a "
+                       "tool using it would fail in the installed app; add it to the feature tour with the template sync to 0.1.34 or later",
+}
 
 
 def catalogue() -> set[str]:
